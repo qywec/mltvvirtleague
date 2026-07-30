@@ -805,4 +805,108 @@
         } else {
           for (var p = 0; p < t.players.length; p++) {
             var pl = t.players[p];
-            html += '<div style="display:flex;align-items:
+            html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;background:#1a1a2e;padding:8px;border-radius:10px;">';
+            html += playerPhotoHTML(pl, true, i, p);
+            html += '<input value="' + esc(pl.nick) + '" onchange="updatePlayerField(' + i + ',' + p + ',\'nick\',this.value)" style="flex:2;margin:0;padding:8px;">';
+            html += '<input value="' + esc(pl.role) + '" onchange="updatePlayerField(' + i + ',' + p + ',\'role\',this.value)" style="flex:1;margin:0;padding:8px;">';
+            html += '<button class="red" onclick="deletePlayerFromTeam(' + i + ',' + p + ')" style="padding:8px 12px;">✕</button>';
+            html += '</div>';
+          }
+        }
+        html += '</div>';
+      }
+      document.getElementById('admin-rosters').innerHTML = html;
+    }
+
+    async function addPlayerToTeam(teamIdx) {
+      if (!isAdmin) return;
+      if (!DB.teams[teamIdx].players) DB.teams[teamIdx].players = [];
+      DB.teams[teamIdx].players.push({ nick: 'Игрок', role: 'Роль', photo: '' });
+      await saveToSupabase();
+      buildAdminRosters();
+    }
+
+    async function updatePlayerField(teamIdx, playerIdx, field, value) {
+      if (!isAdmin) return;
+      if (DB.teams[teamIdx] && DB.teams[teamIdx].players[playerIdx]) {
+        DB.teams[teamIdx].players[playerIdx][field] = value;
+        await saveToSupabase();
+      }
+    }
+
+    async function deletePlayerFromTeam(teamIdx, playerIdx) {
+      if (!isAdmin) return;
+      DB.teams[teamIdx].players.splice(playerIdx, 1);
+      await saveToSupabase();
+      buildAdminRosters();
+    }
+
+    function updateMatchSelects() {
+      if (!isAdmin) return;
+      var opts = '';
+      for (var i = 0; i < DB.teams.length; i++) {
+        opts += '<option>' + esc(DB.teams[i].name) + '</option>';
+      }
+      document.getElementById('match-team1').innerHTML = opts;
+      document.getElementById('match-team2').innerHTML = opts;
+    }
+
+    async function addNewTeam() {
+      if (!isAdmin) return;
+      var name = document.getElementById('add-name').value.trim();
+      if (!name) { alert('Введите название!'); return; }
+      DB.teams.push({
+        name: name,
+        region: document.getElementById('add-region').value.trim() || 'EU',
+        points: parseInt(document.getElementById('add-points').value) || 500,
+        logo: '',
+        players: []
+      });
+      document.getElementById('add-name').value = '';
+      await saveToSupabase();
+      refreshAllAdmin();
+    }
+
+    async function addNewMatch() {
+      if (!isAdmin) return;
+      DB.matches.push({
+        team1: document.getElementById('match-team1').value,
+        team2: document.getElementById('match-team2').value,
+        score: document.getElementById('match-score-input').value.trim() || '0:0',
+        tournament: document.getElementById('match-tour-input').value.trim() || 'Турнир',
+        date: new Date().toLocaleDateString('ru-RU')
+      });
+      await saveToSupabase();
+      buildMatchesList();
+    }
+
+    async function addNewTournament() {
+      if (!isAdmin) return;
+      var name = document.getElementById('tour-name-input').value.trim();
+      if (!name) { alert('Введите название!'); return; }
+      DB.tournaments.push({
+        name: name,
+        start: document.getElementById('tour-start-input').value,
+        end: document.getElementById('tour-end-input').value
+      });
+      document.getElementById('tour-name-input').value = '';
+      await saveToSupabase();
+      buildTournamentsList();
+    }
+
+    async function init() {
+      await loadFromSupabase();
+      
+      if (localStorage.getItem('mltv_is_admin') === 'true') {
+        isAdmin = true;
+      }
+      
+      buildRatingList();
+      buildMatchesList();
+      buildTournamentsList();
+    }
+
+    init();
+  </script>
+</body>
+</html>
