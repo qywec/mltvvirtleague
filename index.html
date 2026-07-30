@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>MLTV - CS2</title>
+  <title>MLTV - CS2 Рейтинг</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
@@ -111,6 +111,9 @@
       background: #333;
       flex-shrink: 0;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .team-logo img {
@@ -138,6 +141,25 @@
       color: #ff9500;
       font-weight: bold;
       flex-shrink: 0;
+    }
+
+    .login-box {
+      background: #1a1a2e;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      background: #0a0a1f;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 16px;
+      text-align: center;
     }
 
     .admin-panel {
@@ -194,39 +216,23 @@
       margin-bottom: 8px;
     }
 
+    .player-photo-box, .player-photo-static {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #333;
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
     .player-photo-box {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: #333;
-      flex-shrink: 0;
-      overflow: hidden;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
-    .player-photo-box img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    /* Для страницы команды - фото не кликабельно */
-    .player-photo-static {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: #333;
-      flex-shrink: 0;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .player-photo-static img {
+    .player-photo-box img, .player-photo-static img {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -288,17 +294,24 @@
       align-items: center;
       margin-bottom: 10px;
     }
+
+    .logout-btn {
+      background: #555;
+      color: #fff;
+      font-size: 12px;
+      padding: 8px 12px;
+      min-height: auto;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Скрытый input для файлов -->
   <input type="file" accept="image/*" id="hiddenFileInput" style="display:none;" onchange="onFilePicked(event)">
 
   <!-- Шапка -->
   <div class="header">
     <span class="logo-text" onclick="showRating()">MLTV</span>
-    <button onclick="toggleAdminPanel()">⚙️ Админ</button>
+    <button onclick="openAdminAccess()">⚙️ Админ</button>
   </div>
 
   <!-- Вкладки -->
@@ -306,6 +319,17 @@
     <button id="tab-rating" class="active-tab" onclick="showRating()">Рейтинг</button>
     <button id="tab-matches" onclick="showMatches()">Матчи</button>
     <button id="tab-tournaments" onclick="showTournaments()">Турниры</button>
+  </div>
+
+  <!-- Страница входа в админку -->
+  <div id="page-login" class="page">
+    <div class="login-box">
+      <h3>🔐 Вход в админ-панель</h3>
+      <p style="color:#999;margin-bottom:15px;">Введите пароль администратора</p>
+      <input type="password" id="admin-password" placeholder="Пароль">
+      <button onclick="loginAsAdmin()" style="width:100%;">Войти</button>
+      <button onclick="showRating()" style="width:100%;background:#555;color:#fff;margin-top:5px;">Отмена</button>
+    </div>
   </div>
 
   <!-- Страница Рейтинг -->
@@ -323,73 +347,152 @@
     <div id="tournaments-container"></div>
   </div>
 
-  <!-- Страница команды (только просмотр) -->
+  <!-- Страница команды -->
   <div id="page-team" class="page">
     <span class="back-link" onclick="showRating()">← Назад</span>
     <div id="team-detail"></div>
   </div>
 
   <!-- Админ-панель -->
-  <div id="admin-panel" class="admin-panel hidden-box">
-    <h3>🛠️ Админ-панель</h3>
+  <div id="page-admin" class="page">
+    <div class="admin-panel">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h3>🛠️ Админ-панель</h3>
+        <button class="logout-btn" onclick="logoutAdmin()">Выйти</button>
+      </div>
 
-    <h4>➕ Добавить команду</h4>
-    <input id="add-name" placeholder="Название команды">
-    <div class="row-inputs">
-      <input id="add-region" placeholder="Регион" value="EU">
-      <input id="add-points" type="number" placeholder="Очки" value="500">
+      <h4>➕ Добавить команду</h4>
+      <input id="add-name" placeholder="Название команды">
+      <div class="row-inputs">
+        <input id="add-region" placeholder="Регион" value="EU">
+        <input id="add-points" type="number" placeholder="Очки" value="500">
+      </div>
+      <button onclick="addNewTeam()">Добавить</button>
+
+      <h4>📋 Команды (редактировать / логотип)</h4>
+      <div id="admin-teams"></div>
+
+      <h4>👥 Составы команд</h4>
+      <div id="admin-rosters"></div>
+
+      <h4>🎮 Добавить матч</h4>
+      <select id="match-team1"></select>
+      <select id="match-team2"></select>
+      <div class="row-inputs">
+        <input id="match-score-input" placeholder="Счёт (2:1)">
+        <input id="match-tour-input" placeholder="Турнир">
+      </div>
+      <button onclick="addNewMatch()">Добавить матч</button>
+
+      <h4>📅 Добавить турнир</h4>
+      <input id="tour-name-input" placeholder="Название">
+      <div class="row-inputs">
+        <input id="tour-start-input" type="date" value="2026-08-01">
+        <input id="tour-end-input" type="date" value="2026-08-10">
+      </div>
+      <button onclick="addNewTournament()">Добавить турнир</button>
+
+      <h4>⚠️ Сброс</h4>
+      <button class="red" onclick="resetAllData()">Сбросить всё</button>
     </div>
-    <button onclick="addNewTeam()">Добавить</button>
-
-    <h4>📋 Команды (редактировать / логотип)</h4>
-    <div id="admin-teams"></div>
-
-    <h4>👥 Составы команд</h4>
-    <div id="admin-rosters"></div>
-
-    <h4>🎮 Добавить матч</h4>
-    <select id="match-team1"></select>
-    <select id="match-team2"></select>
-    <div class="row-inputs">
-      <input id="match-score-input" placeholder="Счёт (2:1)">
-      <input id="match-tour-input" placeholder="Турнир">
-    </div>
-    <button onclick="addNewMatch()">Добавить матч</button>
-
-    <h4>📅 Добавить турнир</h4>
-    <input id="tour-name-input" placeholder="Название">
-    <div class="row-inputs">
-      <input id="tour-start-input" type="date" value="2026-08-01">
-      <input id="tour-end-input" type="date" value="2026-08-10">
-    </div>
-    <button onclick="addNewTournament()">Добавить турнир</button>
-
-    <h4>⚠️ Сброс</h4>
-    <button class="red" onclick="resetAllData()">Сбросить всё</button>
   </div>
 
+  <!-- Firebase Scripts -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js">
+  </script>
+
   <script>
+    // ========== КОНФИГУРАЦИЯ FIREBASE ==========
+    const firebaseConfig = {
+      apiKey: "AIzaSyBcGqNxqQxQxQxQxQxQxQxQxQxQxQxQxQ",
+      authDomain: "mltv-cs2.firebaseapp.com",
+      databaseURL: "https://mltv-cs2-default-rtdb.firebaseio.com",
+      projectId: "mltv-cs2",
+      storageBucket: "mltv-cs2.appspot.com",
+      messagingSenderId: "123456789012",
+      appId: "1:123456789012:web:abcdef1234567890"
+    };
+
+    // Инициализация Firebase
+    let database = null;
+    let firebaseReady = false;
+
+    try {
+      firebase.initializeApp(firebaseConfig);
+      database = firebase.database();
+      firebaseReady = true;
+    } catch (e) {
+      console.log('Firebase не подключен, используем локальное хранилище');
+    }
+
     // ========== ДАННЫЕ ==========
-    var DB_KEY = 'mltv_work_db_v2';
-    var DB = {
+    const DB_KEY = 'mltv_shared_db';
+    const ADMIN_PASSWORD = 'mltv2026'; // Пароль админа
+
+    let DB = {
       teams: [],
       matches: [],
       tournaments: []
     };
 
-    var UPLOAD_INFO = { type: '', teamIdx: -1, playerIdx: -1 };
+    let isAdmin = false;
+    let UPLOAD_INFO = { type: '', teamIdx: -1, playerIdx: -1 };
 
-    function loadDB() {
-      var raw = localStorage.getItem(DB_KEY);
+    // ========== ЗАГРУЗКА ДАННЫХ ==========
+    function loadDB(callback) {
+      if (firebaseReady && database) {
+        database.ref('data').once('value').then(function(snapshot) {
+          const data = snapshot.val();
+          if (data && data.teams && data.teams.length > 0) {
+            DB = data;
+          } else {
+            setDefaultData();
+            saveDB();
+          }
+          if (callback) callback();
+          refreshAllViews();
+        }).catch(function() {
+          loadLocalDB();
+          if (callback) callback();
+          refreshAllViews();
+        });
+      } else {
+        loadLocalDB();
+        if (callback) callback();
+        refreshAllViews();
+      }
+    }
+
+    function loadLocalDB() {
+      const raw = localStorage.getItem(DB_KEY);
       if (raw) {
         try {
-          var parsed = JSON.parse(raw);
+          const parsed = JSON.parse(raw);
           if (parsed && parsed.teams && parsed.teams.length > 0) {
             DB = parsed;
             return;
           }
         } catch(e) {}
       }
+      setDefaultData();
+    }
+
+    function saveDB(callback) {
+      localStorage.setItem(DB_KEY, JSON.stringify(DB));
+      if (firebaseReady && database && isAdmin) {
+        database.ref('data').set(DB).then(function() {
+          if (callback) callback();
+        }).catch(function() {
+          if (callback) callback();
+        });
+      } else {
+        if (callback) callback();
+      }
+    }
+
+    function setDefaultData() {
       DB.teams = [
         { name:"Falcons", region:"EU", points:1000, logo:"", players:[] },
         { name:"Vitality", region:"EU", points:982, logo:"", players:[] },
@@ -416,23 +519,57 @@
       DB.tournaments = [];
     }
 
-    function saveDB() {
-      localStorage.setItem(DB_KEY, JSON.stringify(DB));
+    function refreshAllViews() {
+      if (document.getElementById('page-rating').classList.contains('show-page')) {
+        buildRatingList();
+      }
+      if (document.getElementById('page-matches').classList.contains('show-page')) {
+        buildMatchesList();
+      }
+      if (document.getElementById('page-tournaments').classList.contains('show-page')) {
+        buildTournamentsList();
+      }
+      if (document.getElementById('page-admin').classList.contains('show-page')) {
+        buildAdminTeamsList();
+        buildAdminRosters();
+        updateMatchSelects();
+      }
     }
 
+    // ========== ПОМОЩНИКИ ==========
     function esc(str) {
       if (!str) return '';
       return String(str).replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
+    function logoHTML(team, size) {
+      if (team.logo) {
+        return '<img src="' + team.logo + '" style="width:100%;height:100%;object-fit:cover;">';
+      }
+      const initials = team.name ? team.name.substring(0,2).toUpperCase() : '?';
+      const fontSize = size === 'big' ? '30px' : '14px';
+      return '<span style="font-size:' + fontSize + ';font-weight:bold;">' + esc(initials) + '</span>';
+    }
+
+    function playerPhotoHTML(player, clickable, teamIdx, playerIdx) {
+      const boxClass = clickable ? 'player-photo-box' : 'player-photo-static';
+      const onclickAttr = clickable ? ' onclick="pickFile(\'player_photo\',' + teamIdx + ',' + playerIdx + ')"' : '';
+      
+      if (player && player.photo) {
+        return '<div class="' + boxClass + '"' + onclickAttr + '><img src="' + player.photo + '" style="width:100%;height:100%;object-fit:cover;"></div>';
+      }
+      const initials = player && player.nick ? player.nick[0].toUpperCase() : '?';
+      return '<div class="' + boxClass + '"' + onclickAttr + '><span style="font-size:20px;">' + esc(initials) + '</span></div>';
+    }
+
     // ========== НАВИГАЦИЯ ==========
     function hideAllPages() {
-      var pages = ['page-rating', 'page-matches', 'page-tournaments', 'page-team'];
-      for (var i = 0; i < pages.length; i++) {
+      const pages = ['page-rating', 'page-matches', 'page-tournaments', 'page-team', 'page-admin', 'page-login'];
+      for (let i = 0; i < pages.length; i++) {
         document.getElementById(pages[i]).classList.remove('show-page');
       }
-      var tabs = ['tab-rating', 'tab-matches', 'tab-tournaments'];
-      for (var j = 0; j < tabs.length; j++) {
+      const tabs = ['tab-rating', 'tab-matches', 'tab-tournaments'];
+      for (let j = 0; j < tabs.length; j++) {
         document.getElementById(tabs[j]).classList.remove('active-tab');
       }
     }
@@ -464,8 +601,43 @@
       buildTeamDetail(idx);
     }
 
-    // ========== ЗАГРУЗКА ФАЙЛОВ (только из админки) ==========
+    function openAdminAccess() {
+      if (isAdmin) {
+        showAdminPanel();
+        return;
+      }
+      hideAllPages();
+      document.getElementById('page-login').classList.add('show-page');
+      document.getElementById('admin-password').value = '';
+    }
+
+    function loginAsAdmin() {
+      const password = document.getElementById('admin-password').value;
+      if (password === ADMIN_PASSWORD) {
+        isAdmin = true;
+        document.getElementById('admin-password').value = '';
+        showAdminPanel();
+      } else {
+        alert('Неверный пароль!');
+      }
+    }
+
+    function logoutAdmin() {
+      isAdmin = false;
+      showRating();
+    }
+
+    function showAdminPanel() {
+      hideAllPages();
+      document.getElementById('page-admin').classList.add('show-page');
+      buildAdminTeamsList();
+      buildAdminRosters();
+      updateMatchSelects();
+    }
+
+    // ========== ЗАГРУЗКА ФАЙЛОВ ==========
     function pickFile(type, teamIdx, playerIdx) {
+      if (!isAdmin) return;
       UPLOAD_INFO.type = type;
       UPLOAD_INFO.teamIdx = teamIdx;
       UPLOAD_INFO.playerIdx = playerIdx;
@@ -473,11 +645,12 @@
     }
 
     function onFilePicked(event) {
-      var file = event.target.files[0];
+      if (!isAdmin) return;
+      const file = event.target.files[0];
       if (!file) return;
-      var reader = new FileReader();
+      const reader = new FileReader();
       reader.onload = function(e) {
-        var dataUrl = e.target.result;
+        const dataUrl = e.target.result;
         if (UPLOAD_INFO.type === 'team_logo') {
           DB.teams[UPLOAD_INFO.teamIdx].logo = dataUrl;
         } else if (UPLOAD_INFO.type === 'player_photo') {
@@ -486,41 +659,20 @@
           }
           DB.teams[UPLOAD_INFO.teamIdx].players[UPLOAD_INFO.playerIdx].photo = dataUrl;
         }
-        saveDB();
-        buildAdminRosters();
-        buildRatingList();
+        saveDB(function() {
+          refreshAllViews();
+        });
         UPLOAD_INFO = { type: '', teamIdx: -1, playerIdx: -1 };
       };
       reader.readAsDataURL(file);
       event.target.value = '';
     }
 
-    // ========== ОТОБРАЖЕНИЕ ЛОГО ==========
-    function logoHTML(team, size) {
-      if (team.logo) {
-        return '<img src="' + team.logo + '" style="width:100%;height:100%;object-fit:cover;">';
-      }
-      var initials = team.name ? team.name.substring(0,2).toUpperCase() : '?';
-      var fontSize = size === 'big' ? '30px' : '14px';
-      return '<span style="font-size:' + fontSize + ';font-weight:bold;">' + esc(initials) + '</span>';
-    }
-
-    function playerPhotoHTML(player, clickable, teamIdx, playerIdx) {
-      var boxClass = clickable ? 'player-photo-box' : 'player-photo-static';
-      var onclickAttr = clickable ? ' onclick="pickFile(\'player_photo\',' + teamIdx + ',' + playerIdx + ')"' : '';
-      
-      if (player && player.photo) {
-        return '<div class="' + boxClass + '"' + onclickAttr + '><img src="' + player.photo + '" style="width:100%;height:100%;object-fit:cover;"></div>';
-      }
-      var initials = player && player.nick ? player.nick[0].toUpperCase() : '?';
-      return '<div class="' + boxClass + '"' + onclickAttr + '><span style="font-size:20px;">' + esc(initials) + '</span></div>';
-    }
-
     // ========== РЕЙТИНГ ==========
     function buildRatingList() {
-      var html = '';
-      for (var i = 0; i < DB.teams.length; i++) {
-        var t = DB.teams[i];
+      let html = '';
+      for (let i = 0; i < DB.teams.length; i++) {
+        const t = DB.teams[i];
         html += '<div class="team-row" onclick="showTeamPage(' + i + ')">';
         html += '<div class="rank-num">#' + (i+1) + '</div>';
         html += '<div class="team-logo">' + logoHTML(t, 'small') + '</div>';
@@ -531,11 +683,11 @@
       document.getElementById('rating-container').innerHTML = html;
     }
 
-    // ========== СТРАНИЦА КОМАНДЫ (только просмотр) ==========
+    // ========== СТРАНИЦА КОМАНДЫ ==========
     function buildTeamDetail(idx) {
-      var t = DB.teams[idx];
+      const t = DB.teams[idx];
       if (!t.players) t.players = [];
-      var html = '';
+      let html = '';
       html += '<div class="logo-big">' + logoHTML(t, 'big') + '</div>';
       html += '<h2 style="text-align:center;">' + esc(t.name) + '</h2>';
       html += '<p style="text-align:center;color:#999;">' + esc(t.region) + ' | Очки: ' + t.points + '</p>';
@@ -544,8 +696,8 @@
       if (t.players.length === 0) {
         html += '<p style="color:#666;">Состав не добавлен</p>';
       } else {
-        for (var p = 0; p < t.players.length; p++) {
-          var pl = t.players[p];
+        for (let p = 0; p < t.players.length; p++) {
+          const pl = t.players[p];
           html += '<div class="player-box">';
           html += '<div class="player-top">';
           html += playerPhotoHTML(pl, false, idx, p);
@@ -562,12 +714,12 @@
 
     // ========== МАТЧИ ==========
     function buildMatchesList() {
-      var html = '';
+      let html = '';
       if (DB.matches.length === 0) {
         html = '<p style="color:#999;">Матчей нет</p>';
       } else {
-        for (var i = DB.matches.length-1; i >= 0; i--) {
-          var m = DB.matches[i];
+        for (let i = DB.matches.length-1; i >= 0; i--) {
+          const m = DB.matches[i];
           html += '<div class="match-card">';
           html += '<div style="color:#ff9500;font-size:12px;">' + esc(m.tournament) + '</div>';
           html += '<div style="font-weight:bold;">' + esc(m.team1) + ' vs ' + esc(m.team2) + '</div>';
@@ -581,12 +733,12 @@
 
     // ========== ТУРНИРЫ ==========
     function buildTournamentsList() {
-      var html = '';
+      let html = '';
       if (DB.tournaments.length === 0) {
         html = '<p style="color:#999;">Турниров нет</p>';
       } else {
-        for (var i = 0; i < DB.tournaments.length; i++) {
-          var t = DB.tournaments[i];
+        for (let i = 0; i < DB.tournaments.length; i++) {
+          const t = DB.tournaments[i];
           html += '<div class="tournament-card">';
           html += '<div style="font-weight:bold;">' + esc(t.name) + '</div>';
           html += '<div style="color:#999;">' + esc(t.start) + ' - ' + esc(t.end) + '</div>';
@@ -598,9 +750,10 @@
 
     // ========== АДМИНКА: КОМАНДЫ ==========
     function buildAdminTeamsList() {
-      var html = '';
-      for (var i = 0; i < DB.teams.length; i++) {
-        var t = DB.teams[i];
+      if (!isAdmin) return;
+      let html = '';
+      for (let i = 0; i < DB.teams.length; i++) {
+        const t = DB.teams[i];
         html += '<div style="background:#0a0a1f;padding:10px;border-radius:10px;margin-bottom:8px;">';
         html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
         html += '<div class="team-logo" onclick="pickFile(\'team_logo\',' + i + ',-1)" style="cursor:pointer;">' + logoHTML(t, 'small') + '</div>';
@@ -620,52 +773,51 @@
     }
 
     function updateTeam(idx, field, value) {
+      if (!isAdmin) return;
       DB.teams[idx][field] = value;
-      saveDB();
-      buildRatingList();
+      saveDB(function() {
+        buildRatingList();
+      });
     }
 
     function moveTeamUp(idx) {
-      if (idx > 0) {
-        var tmp = DB.teams[idx];
-        DB.teams[idx] = DB.teams[idx-1];
-        DB.teams[idx-1] = tmp;
-        saveDB();
-        buildRatingList();
-        buildAdminTeamsList();
-        buildAdminRosters();
-      }
+      if (!isAdmin || idx <= 0) return;
+      const tmp = DB.teams[idx];
+      DB.teams[idx] = DB.teams[idx-1];
+      DB.teams[idx-1] = tmp;
+      saveDB(function() {
+        refreshAllViews();
+      });
     }
 
     function moveTeamDown(idx) {
-      if (idx < DB.teams.length-1) {
-        var tmp = DB.teams[idx];
-        DB.teams[idx] = DB.teams[idx+1];
-        DB.teams[idx+1] = tmp;
-        saveDB();
-        buildRatingList();
-        buildAdminTeamsList();
-        buildAdminRosters();
-      }
+      if (!isAdmin || idx >= DB.teams.length-1) return;
+      const tmp = DB.teams[idx];
+      DB.teams[idx] = DB.teams[idx+1];
+      DB.teams[idx+1] = tmp;
+      saveDB(function() {
+        refreshAllViews();
+      });
     }
 
     function removeTeam(idx) {
+      if (!isAdmin) return;
       if (DB.teams.length <= 1) { alert('Нельзя удалить всё!'); return; }
       if (confirm('Удалить ' + DB.teams[idx].name + '?')) {
         DB.teams.splice(idx, 1);
-        saveDB();
-        buildRatingList();
-        buildAdminTeamsList();
-        buildAdminRosters();
-        updateMatchSelects();
+        saveDB(function() {
+          refreshAllViews();
+          updateMatchSelects();
+        });
       }
     }
 
     // ========== АДМИНКА: СОСТАВЫ ==========
     function buildAdminRosters() {
-      var html = '';
-      for (var i = 0; i < DB.teams.length; i++) {
-        var t = DB.teams[i];
+      if (!isAdmin) return;
+      let html = '';
+      for (let i = 0; i < DB.teams.length; i++) {
+        const t = DB.teams[i];
         if (!t.players) t.players = [];
         
         html += '<div class="admin-player-row">';
@@ -677,8 +829,8 @@
         if (t.players.length === 0) {
           html += '<p style="color:#666;font-size:13px;">Нет игроков</p>';
         } else {
-          for (var p = 0; p < t.players.length; p++) {
-            var pl = t.players[p];
+          for (let p = 0; p < t.players.length; p++) {
+            const pl = t.players[p];
             html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
             html += playerPhotoHTML(pl, true, i, p);
             html += '<input value="' + esc(pl.nick) + '" onchange="updatePlayer(' + i + ',' + p + ',\'nick\',this.value)" style="flex:2;margin:0;padding:8px;" placeholder="Ник">';
@@ -693,27 +845,33 @@
     }
 
     function addPlayer(teamIdx) {
+      if (!isAdmin) return;
       if (!DB.teams[teamIdx].players) DB.teams[teamIdx].players = [];
       DB.teams[teamIdx].players.push({ nick: 'Игрок', role: 'Роль', photo: '' });
-      saveDB();
-      buildAdminRosters();
+      saveDB(function() {
+        buildAdminRosters();
+      });
     }
 
     function updatePlayer(teamIdx, playerIdx, field, value) {
+      if (!isAdmin) return;
       DB.teams[teamIdx].players[playerIdx][field] = value;
       saveDB();
     }
 
     function deletePlayer(teamIdx, playerIdx) {
+      if (!isAdmin) return;
       DB.teams[teamIdx].players.splice(playerIdx, 1);
-      saveDB();
-      buildAdminRosters();
+      saveDB(function() {
+        buildAdminRosters();
+      });
     }
 
     // ========== МАТЧИ И ТУРНИРЫ ==========
     function updateMatchSelects() {
-      var opts = '';
-      for (var i = 0; i < DB.teams.length; i++) {
+      if (!isAdmin) return;
+      let opts = '';
+      for (let i = 0; i < DB.teams.length; i++) {
         opts += '<option>' + esc(DB.teams[i].name) + '</option>';
       }
       document.getElementById('match-team1').innerHTML = opts;
@@ -721,7 +879,8 @@
     }
 
     function addNewTeam() {
-      var name = document.getElementById('add-name').value.trim();
+      if (!isAdmin) return;
+      const name = document.getElementById('add-name').value.trim();
       if (!name) { alert('Введите название!'); return; }
       DB.teams.push({
         name: name,
@@ -731,14 +890,14 @@
         players: []
       });
       document.getElementById('add-name').value = '';
-      saveDB();
-      buildRatingList();
-      buildAdminTeamsList();
-      buildAdminRosters();
-      updateMatchSelects();
+      saveDB(function() {
+        refreshAllViews();
+        updateMatchSelects();
+      });
     }
 
     function addNewMatch() {
+      if (!isAdmin) return;
       DB.matches.push({
         team1: document.getElementById('match-team1').value,
         team2: document.getElementById('match-team2').value,
@@ -746,12 +905,14 @@
         tournament: document.getElementById('match-tour-input').value.trim() || 'Турнир',
         date: new Date().toLocaleDateString('ru-RU')
       });
-      saveDB();
-      buildMatchesList();
+      saveDB(function() {
+        buildMatchesList();
+      });
     }
 
     function addNewTournament() {
-      var name = document.getElementById('tour-name-input').value.trim();
+      if (!isAdmin) return;
+      const name = document.getElementById('tour-name-input').value.trim();
       if (!name) { alert('Введите название!'); return; }
       DB.tournaments.push({
         name: name,
@@ -759,41 +920,24 @@
         end: document.getElementById('tour-end-input').value
       });
       document.getElementById('tour-name-input').value = '';
-      saveDB();
-      buildTournamentsList();
-    }
-
-    function toggleAdminPanel() {
-      var panel = document.getElementById('admin-panel');
-      if (panel.classList.contains('hidden-box')) {
-        panel.classList.remove('hidden-box');
-        buildAdminTeamsList();
-        buildAdminRosters();
-        updateMatchSelects();
-      } else {
-        panel.classList.add('hidden-box');
-      }
+      saveDB(function() {
+        buildTournamentsList();
+      });
     }
 
     function resetAllData() {
+      if (!isAdmin) return;
       if (confirm('Сбросить всё?')) {
-        localStorage.removeItem(DB_KEY);
-        loadDB();
-        buildRatingList();
-        buildMatchesList();
-        buildTournamentsList();
-        buildAdminTeamsList();
-        buildAdminRosters();
-        updateMatchSelects();
-        showRating();
+        setDefaultData();
+        saveDB(function() {
+          refreshAllViews();
+          updateMatchSelects();
+        });
       }
     }
 
     // ========== ЗАПУСК ==========
     loadDB();
-    buildRatingList();
-    buildMatchesList();
-    buildTournamentsList();
   </script>
 </body>
 </html>
