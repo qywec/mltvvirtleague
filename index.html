@@ -371,7 +371,6 @@
     // ========== НАСТРОЙКИ ==========
     var ADMIN_PASSWORD = 'mltv2026';
     
-    // Ваши ключи Supabase
     var SUPABASE_URL = 'https://thlsltelqegxzpoptldd.supabase.co';
     var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRobHNsdGVscWVneHpwb3B0bGRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MjExNDcsImV4cCI6MjEwMDk5NzE0N30.RXOkkQxZ8CWkmJZZRZvXi0J4IVyLwG5LCIpi3TXj8z0';
     
@@ -379,7 +378,6 @@
     var isAdmin = false;
     var currentUpload = null;
 
-    // ========== ДАННЫЕ ПО УМОЛЧАНИЮ ==========
     function setDefaultData() {
       DB.teams = [
         { name:"Falcons", region:"EU", points:1000, logo:"", players:[] },
@@ -407,36 +405,53 @@
       DB.tournaments = [];
     }
 
-    // ========== ЗАГРУЗКА ИЗ SUPABASE ==========
+    // Загрузка из Supabase
     async function loadFromSupabase() {
       try {
+        console.log('Загружаю данные из Supabase...');
         var response = await fetch(SUPABASE_URL + '/rest/v1/data?id=eq.1', {
           headers: {
             'apikey': SUPABASE_KEY,
             'Authorization': 'Bearer ' + SUPABASE_KEY
           }
         });
+        
+        if (!response.ok) {
+          throw new Error('Ошибка ответа: ' + response.status);
+        }
+        
         var data = await response.json();
+        console.log('Данные получены:', data);
+        
         if (data && data.length > 0 && data[0].content) {
           var parsed = JSON.parse(data[0].content);
           if (parsed.teams && parsed.teams.length > 0) {
             DB = parsed;
+            console.log('Данные загружены успешно, команд: ' + DB.teams.length);
             return;
           }
         }
+        console.log('Данные пустые, использую стандартные');
         setDefaultData();
         await saveToSupabase();
       } catch(e) {
-        console.log('Ошибка загрузки, использую локальные данные');
+        console.error('Ошибка загрузки:', e);
         loadLocal();
       }
     }
 
+    // Сохранение в Supabase
     async function saveToSupabase() {
-      if (!isAdmin) return;
+      if (!isAdmin) {
+        console.log('Не админ, не сохраняю');
+        return;
+      }
+      
       try {
         var content = JSON.stringify(DB);
-        await fetch(SUPABASE_URL + '/rest/v1/data?id=eq.1', {
+        console.log('Сохраняю данные...');
+        
+        var response = await fetch(SUPABASE_URL + '/rest/v1/data?id=eq.1', {
           method: 'PATCH',
           headers: {
             'apikey': SUPABASE_KEY,
@@ -446,20 +461,29 @@
           },
           body: JSON.stringify({ content: content })
         });
-        localStorage.setItem('mltv_backup', content);
+        
+        if (response.ok) {
+          console.log('Данные сохранены в Supabase!');
+          localStorage.setItem('mltv_backup', content);
+        } else {
+          console.error('Ошибка сохранения:', response.status);
+          localStorage.setItem('mltv_backup', content);
+        }
       } catch(e) {
-        console.log('Ошибка сохранения в Supabase');
+        console.error('Ошибка сохранения:', e);
         localStorage.setItem('mltv_backup', JSON.stringify(DB));
       }
     }
 
     function loadLocal() {
+      console.log('Загружаю из localStorage...');
       var saved = localStorage.getItem('mltv_backup');
       if (saved) {
         try {
           var data = JSON.parse(saved);
           if (data && data.teams && data.teams.length > 0) {
             DB = data;
+            console.log('Загружено из localStorage, команд: ' + DB.teams.length);
             return;
           }
         } catch(e) {}
@@ -473,12 +497,14 @@
         var response = await fetch(SUPABASE_URL + '/rest/v1/data?id=eq.1', {
           headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
         });
-        var data = await response.json();
-        if (data && data.length > 0 && data[0].content) {
-          var parsed = JSON.parse(data[0].content);
-          if (JSON.stringify(parsed) !== JSON.stringify(DB)) {
-            DB = parsed;
-            refreshCurrentView();
+        if (response.ok) {
+          var data = await response.json();
+          if (data && data.length > 0 && data[0].content) {
+            var parsed = JSON.parse(data[0].content);
+            if (JSON.stringify(parsed) !== JSON.stringify(DB)) {
+              DB = parsed;
+              refreshCurrentView();
+            }
           }
         }
       } catch(e) {}
@@ -490,7 +516,6 @@
       if (document.getElementById('page-tournaments').classList.contains('show-page')) buildTournamentsList();
     }
 
-    // ========== ПОМОЩНИКИ ==========
     function esc(s) {
       if (!s) return '';
       return String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -516,7 +541,6 @@
       return '<div class="' + boxClass + '"' + onclickAttr + '><span style="font-size:20px;">' + esc(initials) + '</span></div>';
     }
 
-    // ========== НАВИГАЦИЯ ==========
     function hideAllPages() {
       var pages = ['page-rating', 'page-matches', 'page-tournaments', 'page-team', 'page-admin', 'page-login'];
       for (var i = 0; i < pages.length; i++) {
@@ -585,7 +609,6 @@
       updateMatchSelects();
     }
 
-    // ========== ЗАГРУЗКА ИЗОБРАЖЕНИЙ ==========
     function uploadTeamLogo(teamIdx) {
       currentUpload = { type: 'team_logo', teamIdx: teamIdx, playerIdx: -1 };
       document.getElementById('hiddenFileInput').click();
@@ -625,7 +648,6 @@
       event.target.value = '';
     });
 
-    // ========== РЕЙТИНГ ==========
     function buildRatingList() {
       var html = '';
       for (var i = 0; i < DB.teams.length; i++) {
@@ -638,9 +660,8 @@
         html += '</div>';
       }
       document.getElementById('rating-container').innerHTML = html;
-    }
+  }
 
-    // ========== СТРАНИЦА КОМАНДЫ ==========
     function buildTeamDetail(idx) {
       var t = DB.teams[idx];
       if (!t) return;
@@ -671,7 +692,6 @@
       document.getElementById('team-detail').innerHTML = html;
     }
 
-    // ========== МАТЧИ ==========
     function buildMatchesList() {
       var html = '';
       if (DB.matches.length === 0) {
@@ -689,7 +709,6 @@
       document.getElementById('matches-container').innerHTML = html;
     }
 
-    // ========== ТУРНИРЫ ==========
     function buildTournamentsList() {
       var html = '';
       if (DB.tournaments.length === 0) {
@@ -706,7 +725,6 @@
       document.getElementById('tournaments-container').innerHTML = html;
     }
 
-    // ========== АДМИНКА: КОМАНДЫ ==========
     function buildAdminTeamsList() {
       if (!isAdmin) return;
       var html = '';
@@ -773,7 +791,6 @@
       updateMatchSelects();
     }
 
-    // ========== АДМИНКА: СОСТАВЫ ==========
     function buildAdminRosters() {
       if (!isAdmin) return;
       var html = '';
@@ -788,111 +805,4 @@
         } else {
           for (var p = 0; p < t.players.length; p++) {
             var pl = t.players[p];
-            html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;background:#1a1a2e;padding:8px;border-radius:10px;">';
-            html += playerPhotoHTML(pl, true, i, p);
-            html += '<input value="' + esc(pl.nick) + '" onchange="updatePlayerField(' + i + ',' + p + ',\'nick\',this.value)" style="flex:2;margin:0;padding:8px;">';
-            html += '<input value="' + esc(pl.role) + '" onchange="updatePlayerField(' + i + ',' + p + ',\'role\',this.value)" style="flex:1;margin:0;padding:8px;">';
-            html += '<button class="red" onclick="deletePlayerFromTeam(' + i + ',' + p + ')" style="padding:8px 12px;">✕</button>';
-            html += '</div>';
-          }
-        }
-        html += '</div>';
-      }
-      document.getElementById('admin-rosters').innerHTML = html;
-    }
-
-    async function addPlayerToTeam(teamIdx) {
-      if (!isAdmin) return;
-      if (!DB.teams[teamIdx].players) DB.teams[teamIdx].players = [];
-      DB.teams[teamIdx].players.push({ nick: 'Игрок', role: 'Роль', photo: '' });
-      await saveToSupabase();
-      buildAdminRosters();
-    }
-
-    async function updatePlayerField(teamIdx, playerIdx, field, value) {
-      if (!isAdmin) return;
-      if (DB.teams[teamIdx] && DB.teams[teamIdx].players[playerIdx]) {
-        DB.teams[teamIdx].players[playerIdx][field] = value;
-        await saveToSupabase();
-      }
-    }
-
-    async function deletePlayerFromTeam(teamIdx, playerIdx) {
-      if (!isAdmin) return;
-      DB.teams[teamIdx].players.splice(playerIdx, 1);
-      await saveToSupabase();
-      buildAdminRosters();
-    }
-
-    // ========== МАТЧИ И ТУРНИРЫ ==========
-    function updateMatchSelects() {
-      if (!isAdmin) return;
-      var opts = '';
-      for (var i = 0; i < DB.teams.length; i++) {
-        opts += '<option>' + esc(DB.teams[i].name) + '</option>';
-      }
-      document.getElementById('match-team1').innerHTML = opts;
-      document.getElementById('match-team2').innerHTML = opts;
-    }
-
-    async function addNewTeam() {
-      if (!isAdmin) return;
-      var name = document.getElementById('add-name').value.trim();
-      if (!name) { alert('Введите название!'); return; }
-      DB.teams.push({
-        name: name,
-        region: document.getElementById('add-region').value.trim() || 'EU',
-        points: parseInt(document.getElementById('add-points').value) || 500,
-        logo: '',
-        players: []
-      });
-      document.getElementById('add-name').value = '';
-      await saveToSupabase();
-      refreshAllAdmin();
-    }
-
-    async function addNewMatch() {
-      if (!isAdmin) return;
-      DB.matches.push({
-        team1: document.getElementById('match-team1').value,
-        team2: document.getElementById('match-team2').value,
-        score: document.getElementById('match-score-input').value.trim() || '0:0',
-        tournament: document.getElementById('match-tour-input').value.trim() || 'Турнир',
-        date: new Date().toLocaleDateString('ru-RU')
-      });
-      await saveToSupabase();
-      buildMatchesList();
-    }
-
-    async function addNewTournament() {
-      if (!isAdmin) return;
-      var name = document.getElementById('tour-name-input').value.trim();
-      if (!name) { alert('Введите название!'); return; }
-      DB.tournaments.push({
-        name: name,
-        start: document.getElementById('tour-start-input').value,
-        end: document.getElementById('tour-end-input').value
-      });
-      document.getElementById('tour-name-input').value = '';
-      await saveToSupabase();
-      buildTournamentsList();
-    }
-
-    // ========== ЗАПУСК ==========
-    async function init() {
-      await loadFromSupabase();
-      
-      // Проверяем, был ли админ залогинен
-      if (localStorage.getItem('mltv_is_admin') === 'true') {
-        isAdmin = true;
-      }
-      
-      buildRatingList();
-      buildMatchesList();
-      buildTournamentsList();
-    }
-
-    init();
-  </script>
-</body>
-</html>
+            html += '<div style="display:flex;align-items:
