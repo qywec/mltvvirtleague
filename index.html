@@ -235,7 +235,6 @@
   </div>
 
   <script>
-    // ===== КОНФИГУРАЦИЯ =====
     var PW = 'mltv2026';
     var SU = 'https://thlsltelqegxzpoptldd.supabase.co';
     var SK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRobHNsdGVscWVneHpwb3B0bGRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MjExNDcsImV4cCI6MjEwMDk5NzE0N30.RXOkkQxZ8CWkmJZZRZvXi0J4IVyLwG5LCIpi3TXj8z0';
@@ -245,7 +244,6 @@
     var upload = null;
     var cur = 'rating';
 
-    // ===== ДАННЫЕ ПО УМОЛЧАНИЮ =====
     function def() {
       var teams = ["Falcons","Vitality","Spirit","FURIA","Natus Vincere","9z","BetBoom","Aurora","G2","MOUZ","Legacy","The MongolZ","FaZe","FUT","Astralis","B8","PARIVISION","paiN","GamerLegion","Liquid"];
       var regions = ["EU","EU","EU","SA","EU","SA","EU","EU","EU","EU","NA","AS","EU","EU","EU","EU","EU","SA","EU","NA"];
@@ -257,19 +255,18 @@
       DB.matches = []; DB.tournaments = []; DB.transfers = [];
     }
 
-    // ===== ЗАГРУЗКА =====
     async function load() {
       try {
         var r = await fetch(SU + '/rest/v1/data?id=eq.1', { headers: { 'apikey': SK, 'Authorization': 'Bearer ' + SK } });
         if (r.ok) { var d = await r.json(); if (d[0] && d[0].content) { var p = JSON.parse(d[0].content); if (p.teams && p.teams.length > 0) { DB = p; if(!DB.transfers) DB.transfers=[]; if(!DB.matches) DB.matches=[]; if(!DB.tournaments) DB.tournaments=[]; return; } } }
       } catch(e) {}
-      var s = localStorage.getItem('mltv_fix_v1');
+      var s = localStorage.getItem('mltv_big_v1');
       if (s) { try { var p = JSON.parse(s); if (p.teams && p.teams.length > 0) { DB = p; if(!DB.transfers) DB.transfers=[]; if(!DB.matches) DB.matches=[]; if(!DB.tournaments) DB.tournaments=[]; return; } } catch(e) {} }
       def(); save();
     }
 
     function save() {
-      var j = JSON.stringify(DB); localStorage.setItem('mltv_fix_v1', j);
+      var j = JSON.stringify(DB); localStorage.setItem('mltv_big_v1', j);
       if (admin) fetch(SU + '/rest/v1/data?id=eq.1', { method: 'PATCH', headers: { 'apikey': SK, 'Authorization': 'Bearer ' + SK, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify({ content: j }) }).catch(function(){});
     }
 
@@ -304,7 +301,6 @@
       return '<div class="' + cls + '"' + o + '>' + esc((p&&p.nick)?p.nick[0].toUpperCase():'?') + '</div>';
     }
 
-    // ПРАВИЛЬНЫЙ ПОДСЧЁТ РЕЙТИНГА 2.0
     function gs(n) {
       var s = { m:0, k:0, d:0, a:0, kd:'0.00', r:'0.00', kpr:'0.00', dpr:'0.00', apr:'0.00' };
       for (var i = 0; i < DB.matches.length; i++) {
@@ -315,7 +311,7 @@
               s.m++;
               s.k += parseInt(m.stats[j].k) || 0;
               s.d += parseInt(m.stats[j].d) || 0;
-              s.a += parseInt(m.stats[j].a) || 0;
+                    s.a += parseInt(m.stats[j].a) || 0;
             }
           }
         }
@@ -330,7 +326,6 @@
       return s;
     }
 
-    // ===== НАВИГАЦИЯ =====
     function go(p) {
       cur = p;
       document.querySelectorAll('.page').forEach(function(x){ x.classList.remove('active'); });
@@ -348,10 +343,9 @@
     }
 
     function openAdmin() { if (admin) { go('admin'); return; } go('login'); }
-    function login() { if (document.getElementById('pw').value === PW) { admin = true; localStorage.setItem('mltv_ad_fix', '1'); save(); go('admin'); } else alert('Неверный пароль!'); }
-    function logout() { admin = false; localStorage.removeItem('mltv_ad_fix'); go('rating'); }
+    function login() { if (document.getElementById('pw').value === PW) { admin = true; localStorage.setItem('mltv_ad_big', '1'); save(); go('admin'); } else alert('Неверный пароль!'); }
+    function logout() { admin = false; localStorage.removeItem('mltv_ad_big'); go('rating'); }
 
-    // ===== РЕЙТИНГ =====
     function rating() {
       DB.teams.sort(function(a,b){ return b.points - a.points; });
       var h = '<div class="section-title">🏆 Топ-20 команд <span class="count">' + DB.teams.length + ' команд</span></div>';
@@ -364,7 +358,6 @@
       document.getElementById('rating-list').innerHTML = h;
     }
 
-    // ===== СТРАНИЦА КОМАНДЫ =====
     function showTeam(i) {
       go('team'); var t = DB.teams[i]; if (!t) return; if (!t.players) t.players = [];
       var h = '<div style="text-align:center;padding:8px;"><div class="team-logo" style="width:56px;height:56px;margin:0 auto;border:2px solid var(--orange);">' + logo(t,'lg') + '</div><h2 style="margin-top:6px;">' + esc(t.name) + '</h2><p style="color:var(--text3);">' + esc(t.region) + ' • ' + t.points + ' очков</p></div>';
@@ -376,7 +369,6 @@
       document.getElementById('team-view').innerHTML = h;
     }
 
-    // ===== СТРАНИЦА ИГРОКА =====
     function showPlayer(ti, pi) {
       go('player'); var t = DB.teams[ti], pl = t.players[pi]; if (!pl) return;
       var s = gs(pl.nick);
@@ -389,7 +381,6 @@
       document.getElementById('player-view').innerHTML = h;
     }
 
-    // ===== МАТЧИ =====
     function matches() {
       var h = '<div class="section-title">🎮 Матчи <span class="count">' + DB.matches.length + '</span></div>';
       if (!DB.matches.length) h += '<div class="empty-state"><div class="icon">🎯</div><p>Матчей пока нет</p></div>';
@@ -402,7 +393,6 @@
       document.getElementById('matches-list').innerHTML = h;
     }
 
-    // ===== СТРАНИЦА МАТЧА С УДАЛЕНИЕМ =====
     function showMatch(i) {
       go('match'); var m = DB.matches[i]; if (!m) return;
       var t1 = ft(m.t1), t2 = ft(m.t2);
@@ -433,7 +423,6 @@
       }
     }
 
-    // ===== ТУРНИРЫ =====
     function tournaments() {
       var h = '<div class="section-title">📅 Турниры <span class="count">' + DB.tournaments.length + '</span></div>';
       if (!DB.tournaments.length) h += '<div class="empty-state"><div class="icon">🏟️</div><p>Турниров пока нет</p></div>';
@@ -458,7 +447,6 @@
       document.getElementById('tournament-view').innerHTML = h;
     }
 
-    // ===== СТАТИСТИКА =====
     function stats() {
       var all = [];
       for (var i = 0; i < DB.teams.length; i++) for (var j = 0; j < DB.teams[i].players.length; j++) { var s = gs(DB.teams[i].players[j].nick); if (s.m > 0) all.push({ n: DB.teams[i].players[j].nick, t: DB.teams[i].name, s: s }); }
@@ -469,7 +457,6 @@
       document.getElementById('stats-list').innerHTML = h;
     }
 
-    // ===== ТРАНСФЕРЫ =====
     function transfers() {
       var h = '<div class="section-title">🔄 Трансферы <span class="count">' + DB.transfers.length + '</span></div>';
       if (!DB.transfers.length) h += '<div class="empty-state"><p>Трансферов пока нет</p></div>';
@@ -477,7 +464,6 @@
       document.getElementById('transfers-list').innerHTML = h;
     }
 
-    // ===== АДМИНКА: ЗАГРУЗКА =====
     function upLogo(i) { upload = { t: 'logo', i: i }; document.getElementById('fileInput').click(); }
     function upPhoto(i,p) { upload = { t: 'photo', i: i, p: p }; document.getElementById('fileInput').click(); }
 
@@ -488,7 +474,6 @@
       r.readAsDataURL(f); e.target.value = '';
     });
 
-    // ===== АДМИНКА: КОМАНДЫ =====
     function buildAT() {
       if (!admin) return; var h = '';
       for (var i = 0; i < DB.teams.length; i++) { var t = DB.teams[i]; h += '<div style="background:var(--bg);padding:6px;border-radius:4px;margin-bottom:4px;display:flex;align-items:center;gap:4px;"><div class="team-logo" onclick="upLogo(' + i + ')" style="cursor:pointer;width:24px;height:24px;">' + logo(t) + '</div><input value="' + esc(t.name) + '" onchange="uf(' + i + ',\'name\',this.value)" style="flex:2;margin:0;padding:4px;font-size:10px;"><input value="' + esc(t.region) + '" onchange="uf(' + i + ',\'region\',this.value)" style="width:40px;margin:0;padding:4px;font-size:10px;"><input type="number" value="' + t.points + '" onchange="uf(' + i + ',\'points\',parseInt(this.value)||0)" style="width:50px;margin:0;padding:4px;font-size:10px;"><button class="btn btn-outline btn-xs" onclick="mu(' + i + ')">▲</button><button class="btn btn-outline btn-xs" onclick="md(' + i + ')">▼</button><button class="btn btn-red btn-xs" onclick="rt(' + i + ')">✕</button></div>'; }
@@ -501,7 +486,6 @@
     function rt(i) { if(DB.teams.length<=1)return; if(confirm('Удалить '+DB.teams[i].name+'?')){DB.teams.splice(i,1);save();ra();} }
     function ra() { rating(); buildAT(); buildAR(); us(); uss(); ut(); }
 
-    // ===== АДМИНКА: СОСТАВЫ =====
     function buildAR() {
       if (!admin) return; var h = '';
       for (var i = 0; i < DB.teams.length; i++) { var t = DB.teams[i]; if (!t.players) t.players = []; h += '<div style="background:var(--bg);padding:6px;border-radius:4px;margin-bottom:4px;"><div style="display:flex;justify-content:space-between;margin-bottom:3px;"><b style="font-size:11px;">' + esc(t.name) + '</b><button class="btn btn-green btn-xs" onclick="ap(' + i + ')">+ Игрок</button></div>'; for (var p = 0; p < t.players.length; p++) { var pl = t.players[p]; h += '<div style="display:flex;gap:3px;align-items:center;margin-top:2px;">' + ava(pl,true,i,p,'sm') + '<input value="' + esc(pl.nick) + '" onchange="up(' + i + ',' + p + ',\'nick\',this.value)" style="flex:2;margin:0;padding:3px;font-size:10px;"><input value="' + esc(pl.role) + '" onchange="up(' + i + ',' + p + ',\'role\',this.value)" style="flex:1;margin:0;padding:3px;font-size:10px;"><button class="btn btn-red btn-xs" onclick="dp(' + i + ',' + p + ')">✕</button></div>'; } h += '</div>'; }
@@ -512,7 +496,6 @@
     function up(i,p,f,v) { if (!admin) return; DB.teams[i].players[p][f] = v; save(); }
     function dp(i,p) { if (!admin) return; DB.teams[i].players.splice(p,1); save(); buildAR(); ut(); }
 
-    // ===== АДМИНКА: МАТЧИ =====
     function us() { var o = ''; for (var i = 0; i < DB.teams.length; i++) o += '<option>' + esc(DB.teams[i].name) + '</option>'; document.getElementById('mt1').innerHTML = o; document.getElementById('mt2').innerHTML = o; }
 
     function uss() {
@@ -547,7 +530,6 @@
 
     function clearStats(mi) { if (!admin) return; if (confirm('Очистить статистику?')) { DB.matches[mi].stats = []; save(); bsf(mi); } }
 
-    // ===== АДМИНКА: ТРАНСФЕРЫ =====
     function ut() {
       if (!admin) return;
       var ps = document.getElementById('tr-player'), o = '<option value="">Игрок...</option>';
@@ -565,14 +547,13 @@
       save(); transfers(); ut(); alert('Трансфер добавлен!');
     }
 
-    // ===== ДОБАВЛЕНИЕ =====
     function addTeam() { if (!admin) return; var n = document.getElementById('an').value.trim(); if (!n) return; DB.teams.push({name:n,region:document.getElementById('ar').value.trim()||'EU',points:parseInt(document.getElementById('ap').value)||500,logo:'',players:[]}); document.getElementById('an').value = ''; save(); ra(); }
     function addMatch() { if (!admin) return; DB.matches.push({t1:document.getElementById('mt1').value,t2:document.getElementById('mt2').value,score:document.getElementById('ms').value.trim()||'0:0',event:document.getElementById('me').value.trim()||'Турнир',date:new Date().toLocaleDateString('ru-RU'),stats:[]}); document.getElementById('ms').value=''; document.getElementById('me').value=''; save(); matches(); uss(); }
     function addTournament() { if (!admin) return; var n = document.getElementById('tn').value.trim(); if (!n) return; var ps = document.querySelectorAll('.po'), pteams = []; for (var k = 0; k < ps.length; k++) if (ps[k].value.trim()) pteams.push(ps[k].value.trim()); var t = { name:n, type:'playoff', bracket:[] }; if (pteams.length >= 2) { var r1 = []; for (var x = 0; x < pteams.length; x += 2) if (pteams[x] && pteams[x+1]) r1.push({t1:pteams[x],t2:pteams[x+1],s:'',w:0}); var r2 = []; for (var y = 0; y < Math.ceil(r1.length/2); y++) r2.push({t1:'',t2:'',s:'',w:0}); var r3 = [{t1:'',t2:'',s:'',w:0}]; t.bracket = r1.length > 2 ? [r1, r2, r3] : r1.length > 1 ? [r1, r3] : [r3]; } DB.tournaments.push(t); document.getElementById('tn').value=''; var ins = document.querySelectorAll('.po'); for (var z = 0; z < ins.length; z++) ins[z].value=''; save(); tournaments(); }
 
     function showAdmin() { buildAT(); buildAR(); us(); uss(); ut(); }
 
-    if (localStorage.getItem('mltv_ad_fix') === '1') admin = true;
+    if (localStorage.getItem('mltv_ad_big') === '1') admin = true;
     load(); rating(); matches(); tournaments(); transfers();
   </script>
 </body>
