@@ -3,408 +3,668 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>MLTV - CS2 Рейтинг</title>
+  <title>MLTV - CS2 Рейтинг, Матчи, Турниры, Статистика</title>
   <style>
+    :root {
+      --bg: #0b0b10;
+      --bg2: #12121a;
+      --bg3: #1a1a26;
+      --bg4: #222230;
+      --orange: #fca311;
+      --orange2: #ff8c00;
+      --text: #e8e8ec;
+      --text2: #9a9aa8;
+      --text3: #6b6b7a;
+      --border: #252535;
+      --border2: #333348;
+      --win: #4caf50;
+      --win2: #2e7d32;
+      --lose: #f44336;
+      --lose2: #c62828;
+      --blue: #2196F3;
+      --gold: #ffd700;
+      --silver: #c0c0c0;
+      --bronze: #cd7f32;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    
+
     body {
-      background: #0a0a0f;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      padding: 10px;
-      padding-bottom: 30px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 13px;
+      line-height: 1.5;
+      -webkit-tap-highlight-color: transparent;
+      padding-bottom: 50px;
     }
 
-    .header {
-      background: #1a1a2e;
-      padding: 15px;
-      border-radius: 15px;
+    /* Скроллбар */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+    /* Шапка */
+    .topbar {
+      background: #0a0a12;
+      border-bottom: 2px solid #1a1a2a;
+      padding: 12px 16px;
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
     }
 
-    .logo-text { font-size: 24px; font-weight: bold; color: #ff9500; cursor: pointer; }
+    .logo-main {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      cursor: pointer;
+      color: #fff;
+      font-style: italic;
+    }
+    .logo-main .accent { color: var(--orange); }
+    .logo-main .cs2 { font-size: 11px; color: var(--text2); margin-left: 2px; font-style: normal; }
 
-    button {
-      background: #ff9500;
-      color: #000;
+    .topbar-right { display: flex; gap: 8px; align-items: center; }
+
+    .btn {
+      padding: 8px 16px;
       border: none;
-      padding: 10px 16px;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 13px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 11px;
       cursor: pointer;
-      margin: 2px;
-      min-height: 40px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.15s;
+      white-space: nowrap;
     }
+    .btn:active { transform: scale(0.95); }
+    .btn-orange { background: var(--orange); color: #000; }
+    .btn-orange:hover { background: #e69500; }
+    .btn-outline { background: transparent; border: 1px solid var(--border2); color: var(--text2); }
+    .btn-red { background: var(--lose2); color: #fff; }
+    .btn-green { background: var(--win2); color: #fff; }
+    .btn-blue { background: var(--blue); color: #fff; }
+    .btn-sm { padding: 5px 10px; font-size: 10px; }
+    .btn-xs { padding: 3px 7px; font-size: 9px; border-radius: 3px; }
 
-    button.red { background: #cc0000; color: #fff; }
-    button.green { background: #00aa00; color: #fff; }
-    button.blue { background: #0066cc; color: #fff; }
-
-    .tabs {
+    /* Навигация */
+    .navbar {
+      background: var(--bg2);
       display: flex;
-      gap: 5px;
-      margin-bottom: 15px;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
     }
-
-    .tabs button {
+    .navbar button {
       flex: 1;
-      background: #1a1a2e;
-      color: #aaa;
-    }
-
-    .tabs button.active-tab { background: #ff9500; color: #000; }
-
-    .page { display: none; }
-    .page.show-page { display: block; }
-
-    .card {
-      background: #1a1a2e;
-      padding: 12px;
-      border-radius: 10px;
-      margin-bottom: 8px;
-    }
-
-    .team-row {
-      background: #1a1a2e;
-      padding: 12px;
-      border-radius: 10px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      padding: 14px 20px;
+      background: none;
+      border: none;
+      color: var(--text2);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
       cursor: pointer;
+      white-space: nowrap;
+      min-width: 70px;
+      transition: all 0.2s;
+      position: relative;
     }
-
-    .rank-num {
-      width: 35px;
-      height: 35px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      background: #333;
-      flex-shrink: 0;
-    }
-
-    .team-row:nth-child(1) .rank-num { background: #ff9500; color: #000; }
-    .team-row:nth-child(2) .rank-num { background: #c0c0c0; color: #000; }
-    .team-row:nth-child(3) .rank-num { background: #cd7f32; color: #000; }
-
-    .team-logo {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      background: #333;
-      flex-shrink: 0;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .team-logo img { width: 100%; height: 100%; object-fit: cover; }
-
-    .team-logo-sm {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      background: #333;
-      flex-shrink: 0;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .team-logo-sm img { width: 100%; height: 100%; object-fit: cover; }
-
-    .team-info { flex: 1; min-width: 0; }
-    .team-name-text { font-weight: bold; font-size: 16px; }
-    .team-region-text { font-size: 12px; color: #999; }
-    .team-points-text { color: #ff9500; font-weight: bold; flex-shrink: 0; }
-
-    .login-box {
-      background: #1a1a2e;
-      padding: 30px;
-      border-radius: 15px;
-      text-align: center;
-    }
-
-    .login-box input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      background: #0a0a1f;
-      border: 1px solid #333;
-      border-radius: 8px;
+    .navbar button.active {
       color: #fff;
-      font-size: 16px;
-      text-align: center;
+      background: rgba(252,163,17,0.05);
     }
-
-    .admin-panel {
-      background: #1a1a2e;
-      padding: 15px;
-      border-radius: 15px;
-      border: 2px solid #ff9500;
-    }
-
-    h3 { color: #ff9500; margin: 15px 0 10px 0; }
-    h4 { color: #ddd; margin: 12px 0 6px 0; }
-
-    input, select {
-      width: 100%;
-      padding: 10px;
-      margin: 4px 0;
-      background: #0a0a1f;
-      border: 1px solid #333;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 14px;
-    }
-
-    .row-inputs { display: flex; gap: 5px; }
-    .row-inputs input { flex: 1; }
-
-    .player-box {
-      background: #0a0a1f;
-      padding: 10px;
-      border-radius: 10px;
-      margin: 6px 0;
-    }
-
-    .player-top { display: flex; align-items: center; gap: 10px; }
-
-    .player-avatar {
+    .navbar button.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
       width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #333;
-      flex-shrink: 0;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      height: 3px;
+      background: var(--orange);
+      border-radius: 2px 2px 0 0;
     }
 
-    .player-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    /* Контент */
+    .page { display: none; padding: 16px 12px; }
+    .page.active { display: block; animation: fadeIn 0.2s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    .back-link { color: #ff9500; font-size: 16px; margin-bottom: 15px; display: inline-block; cursor: pointer; }
+    .container { max-width: 700px; margin: 0 auto; }
 
-    .logo-big {
-      width: 80px;
-      height: 80px;
-      border-radius: 15px;
-      background: #333;
-      margin: 0 auto 10px auto;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .logo-big img { width: 100%; height: 100%; object-fit: cover; }
-
-    input[type="file"] { display: none; }
-
-    .hint-text { font-size: 11px; color: #888; text-align: center; margin: 5px 0; }
-
-    .admin-logo-preview {
-      width: 50px;
-      height: 50px;
-      border-radius: 10px;
-      background: #333;
-      margin: 8px auto;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    .admin-logo-preview img { width: 100%; height: 100%; object-fit: cover; }
-
-    .stats-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 10px 0;
+    /* Заголовки секций */
+    .section-title {
       font-size: 13px;
-    }
-
-    .stats-table th, .stats-table td {
-      padding: 6px 8px;
-      border: 1px solid #333;
-      text-align: center;
-    }
-
-    .stats-table th { background: #1a1a2e; color: #ff9500; }
-
-    .bracket-round {
-      background: #1a1a2e;
-      padding: 10px;
-      border-radius: 10px;
-      margin-bottom: 8px;
-    }
-
-    .bracket-round h4 { color: #ff9500; margin-bottom: 6px; }
-
-    .bracket-match {
-      background: #0a0a1f;
-      padding: 8px;
-      border-radius: 8px;
-      margin-bottom: 5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text2);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--border);
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 13px;
+    }
+    .section-title .icon { font-size: 16px; }
+    .section-title .count {
+      margin-left: auto;
+      font-size: 10px;
+      background: var(--bg4);
+      padding: 3px 10px;
+      border-radius: 12px;
+      color: var(--text3);
     }
 
-    .bracket-team {
-      flex: 1;
-      padding: 5px;
-      border-radius: 5px;
-      text-align: center;
-      font-weight: bold;
-    }
-
-    .winner { background: #1a3a1a; border: 1px solid #4caf50; }
-
-    .bracket-score {
-      font-weight: bold;
-      color: #ff9500;
-      min-width: 30px;
-      text-align: center;
-    }
-
-    .group-box {
-      background: #0a0a1f;
-      padding: 10px;
-      border-radius: 10px;
+    /* Рейтинг */
+    .ranking-card {
+      background: var(--bg2);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
       margin-bottom: 10px;
     }
+    .ranking-header {
+      display: grid;
+      grid-template-columns: 48px 1fr 80px;
+      padding: 10px 16px;
+      background: var(--bg3);
+      font-size: 10px;
+      color: var(--text3);
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .team-row {
+      display: grid;
+      grid-template-columns: 48px 1fr 80px;
+      padding: 10px 16px;
+      align-items: center;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border);
+      transition: all 0.15s;
+    }
+    .team-row:hover { background: rgba(252,163,17,0.03); }
+    .team-row:last-child { border-bottom: none; }
+    .team-row:active { background: rgba(252,163,17,0.08); }
 
-    .match-stats-row {
+    .rank { font-weight: 700; font-size: 13px; color: var(--text3); }
+    .team-row:nth-child(1) .rank { color: var(--gold); font-size: 15px; }
+    .team-row:nth-child(2) .rank { color: var(--silver); font-size: 14px; }
+    .team-row:nth-child(3) .rank { color: var(--bronze); font-size: 14px; }
+
+    .rank-change {
+      font-size: 9px;
+      margin-left: 3px;
+      font-weight: 600;
+    }
+    .rank-up { color: var(--win); }
+    .rank-down { color: var(--lose); }
+    .rank-same { color: var(--text3); }
+
+    .team-cell { display: flex; align-items: center; gap: 10px; }
+    .team-logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      background: var(--bg4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 11px;
+      overflow: hidden;
+      flex-shrink: 0;
+      border: 1px solid var(--border2);
+    }
+    .team-logo img { width: 100%; height: 100%; object-fit: cover; }
+    .team-logo.lg { width: 28px; height: 28px; border-radius: 4px; }
+    .team-name { font-weight: 600; font-size: 13px; }
+    .team-region { font-size: 10px; color: var(--text3); }
+    .points { text-align: right; font-weight: 700; color: var(--orange); font-size: 13px; }
+
+    /* Матчи */
+    .match-card {
+      background: var(--bg2);
+      border-radius: 8px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      transition: all 0.15s;
+      overflow: hidden;
+    }
+    .match-card:hover { border-color: var(--border2); }
+    .match-card:active { background: var(--bg3); }
+
+    .match-header {
+      padding: 8px 14px;
+      font-size: 10px;
+      color: var(--text3);
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      background: rgba(0,0,0,0.2);
+    }
+    .match-header .tournament-tag {
+      color: var(--orange);
+      font-weight: 600;
+    }
+    .match-live {
+      background: var(--lose);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+    .match-body {
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr 70px 1fr;
+      align-items: center;
+      gap: 10px;
+    }
+    .match-team {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .match-team.right { justify-content: flex-end; text-align: right; }
+    .match-team .team-name { font-size: 13px; }
+
+    .match-score-box {
+      text-align: center;
+      background: var(--bg4);
+      border-radius: 6px;
+      padding: 6px 8px;
+    }
+    .match-score { font-size: 18px; font-weight: 700; color: #fff; }
+    .match-bestof { font-size: 9px; color: var(--text3); }
+
+    .match-footer {
+      padding: 6px 14px;
+      font-size: 10px;
+      color: var(--text3);
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Турниры */
+    .tournament-card {
+      background: var(--bg2);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      border-left: 4px solid var(--orange);
+      border: 1px solid var(--border);
+      transition: all 0.15s;
+    }
+    .tournament-card:hover { border-color: var(--orange); }
+    .tournament-card h3 { font-size: 15px; color: #fff; }
+    .tournament-card .meta { font-size: 11px; color: var(--text3); margin-top: 4px; }
+    .tournament-card .teams-count {
+      margin-top: 8px;
+      font-size: 10px;
+      color: var(--orange);
+      font-weight: 600;
+    }
+
+    /* Страница матча */
+    .match-detail-header {
+      text-align: center;
+      padding: 20px 0;
+    }
+    .match-detail-header .vs {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin: 10px 0;
+    }
+    .match-detail-header .team-block {
+      text-align: center;
+    }
+    .match-detail-header .score-big {
+      font-size: 42px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .stats-section {
+      background: var(--bg2);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .stats-section h3 {
+      padding: 12px 14px;
       font-size: 12px;
-      padding: 4px 0;
-      border-bottom: 1px solid #222;
+      text-transform: uppercase;
+      color: var(--orange);
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; }
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    .stats-table th {
+      background: var(--bg4);
+      padding: 6px 8px;
+      text-align: center;
+      font-weight: 600;
+      color: var(--text2);
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+    .stats-table td {
+      padding: 6px 8px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-table tr:hover td { background: rgba(252,163,17,0.03); }
+    .highlight { color: var(--orange); font-weight: 700; }
+
+    /* Сетка */
+    .bracket-container { display: flex; flex-direction: column; gap: 8px; }
+    .bracket-round {
+      background: var(--bg2);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .bracket-round h4 {
+      padding: 10px 14px;
+      font-size: 11px;
+      text-transform: uppercase;
+      background: var(--bg3);
+      color: var(--orange);
+      border-bottom: 1px solid var(--border);
+    }
+    .bracket-match {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .bracket-match:last-child { border-bottom: none; }
+    .bracket-team { flex: 1; font-weight: 600; font-size: 12px; }
+    .bracket-team.win { color: var(--win); }
+    .bracket-team.lose { color: var(--lose); }
+    .bracket-vs { font-weight: 700; color: var(--orange); font-size: 12px; }
+
+    /* Группы */
+    .groups-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .group-box {
+      background: var(--bg2);
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .group-box h4 {
+      padding: 8px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      background: var(--bg3);
+      color: var(--orange);
+    }
+    .group-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10px;
+    }
+    .group-table th {
+      background: var(--bg4);
+      padding: 5px 6px;
+      text-align: center;
+      color: var(--text3);
+    }
+    .group-table td {
+      padding: 5px 6px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Профиль игрока */
+    .player-profile {
+      text-align: center;
+      padding: 20px 0;
+    }
+    .player-avatar-lg {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--bg4);
+      margin: 0 auto 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      font-weight: 700;
+      overflow: hidden;
+      border: 3px solid var(--orange);
+    }
+    .player-avatar-lg img { width: 100%; height: 100%; object-fit: cover; }
+    .player-avatar-sm {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--bg4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .player-avatar-sm img { width: 100%; height: 100%; object-fit: cover; }
+
+    /* Админка */
+    .admin-section {
+      background: var(--bg2);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+    .admin-section h4 {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 5px;
+      color: #fff;
+      font-size: 12px;
+      margin: 3px 0;
+      font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--orange);
+    }
+
+    .row { display: flex; gap: 6px; }
+    .row > * { flex: 1; }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .badge-orange { background: rgba(252,163,17,0.15); color: var(--orange); }
+    .badge-green { background: rgba(76,175,80,0.15); color: var(--win); }
+    .badge-red { background: rgba(244,67,54,0.15); color: var(--lose); }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text3);
+    }
+    .empty-state .icon { font-size: 40px; margin-bottom: 10px; }
+
+    .back-link {
+      color: var(--orange);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .back-link:hover { color: #fff; }
+
+    @media (max-width: 400px) {
+      .match-body { grid-template-columns: 1fr 50px 1fr; gap: 6px; }
+      .match-team { font-size: 12px; }
+      .match-score { font-size: 16px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .groups-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <input type="file" accept="image/*" id="hiddenFileInput" style="display:none;">
+  <input type="file" accept="image/*" id="fileInput" style="display:none;">
 
-  <div class="header">
-    <span class="logo-text" onclick="showRating()">MLTV</span>
-    <button onclick="openAdmin()">⚙️ Админ</button>
-  </div>
-
-  <div class="tabs">
-    <button id="tab-rating" class="active-tab" onclick="showRating()">Рейтинг</button>
-    <button id="tab-matches" onclick="showMatches()">Матчи</button>
-    <button id="tab-tournaments" onclick="showTournaments()">Турниры</button>
-    <button id="tab-stats" onclick="showStats()">Статистика</button>
-  </div>
-
-  <!-- СТРАНИЦЫ -->
-  <div id="page-login" class="page">
-    <div class="login-box">
-      <h3>🔐 Вход</h3>
-      <input type="password" id="admin-password" placeholder="Пароль">
-      <button onclick="login()" style="width:100%;">Войти</button>
-      <button onclick="showRating()" style="width:100%;background:#555;color:#fff;margin-top:5px;">Отмена</button>
+  <!-- HLTV-style Top Bar -->
+  <div class="topbar">
+    <div class="logo-main" onclick="go('rating')">M<span class="accent">LTV</span><span class="cs2">CS2</span></div>
+    <div class="topbar-right">
+      <button class="btn btn-outline btn-sm" onclick="go('matches')">Матчи</button>
+      <button class="btn btn-orange btn-sm" onclick="openAdmin()">Админ</button>
     </div>
   </div>
 
-  <div id="page-rating" class="page show-page"><div id="rating-container"></div></div>
-  <div id="page-matches" class="page"><div id="matches-container"></div></div>
-  <div id="page-tournaments" class="page"><div id="tournaments-container"></div></div>
-  <div id="page-tournament" class="page">
-    <span class="back-link" onclick="showTournaments()">← К турнирам</span>
-    <div id="tournament-content"></div>
+  <!-- Навигация -->
+  <div class="navbar">
+    <button class="active" data-page="rating">🏆 Рейтинг</button>
+    <button data-page="matches">🎮 Матчи</button>
+    <button data-page="tournaments">📅 Турниры</button>
+    <button data-page="stats">📊 Статистика</button>
   </div>
-  <div id="page-match" class="page">
-    <span class="back-link" onclick="showMatches()">← К матчам</span>
-    <div id="match-content"></div>
-  </div>
-  <div id="page-stats" class="page"><div id="stats-container"></div></div>
-  <div id="page-team" class="page">
-    <span class="back-link" onclick="showRating()">← Назад</span>
-    <div id="team-content"></div>
-  </div>
-  <div id="page-admin" class="page">
-    <div class="admin-panel">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <h3>🛠️ Админ</h3>
-        <button onclick="logout()" style="background:#555;color:#fff;font-size:11px;padding:6px 10px;min-height:auto;">Выйти</button>
+
+  <!-- СТРАНИЦЫ -->
+  <div id="p-login" class="page">
+    <div class="container">
+      <div style="max-width:380px;margin:40px auto;background:var(--bg2);padding:30px;border-radius:8px;border:1px solid var(--border);text-align:center;">
+        <h3 style="color:var(--orange);margin-bottom:20px;">🔐 Вход в админ-панель</h3>
+        <input type="password" id="pw" placeholder="Пароль администратора">
+        <button class="btn btn-orange" onclick="login()" style="width:100%;margin-top:10px;">Войти</button>
+        <button class="btn btn-outline" onclick="go('rating')" style="width:100%;margin-top:5px;">Отмена</button>
       </div>
+    </div>
+  </div>
 
-      <h4>➕ Команда</h4>
-      <div class="row-inputs"><input id="add-name" placeholder="Название"><input id="add-region" placeholder="Регион" value="EU"></div>
-      <input id="add-points" type="number" placeholder="Очки" value="500">
-      <button onclick="addTeam()">Добавить</button>
-
-      <h4>📋 Команды</h4>
-      <div id="admin-teams"></div>
-
-      <h4>👥 Составы</h4>
-      <div id="admin-rosters"></div>
-
-      <h4>🎮 Матч</h4>
-      <select id="m-t1"></select>
-      <select id="m-t2"></select>
-      <div class="row-inputs"><input id="m-score" placeholder="Счёт (16:14)"><input id="m-event" placeholder="Турнир"></div>
-      <button onclick="addMatch()">Добавить матч</button>
-
-      <h4>📊 Статистика матча</h4>
-      <select id="stats-match"></select>
-      <div id="stats-form"></div>
-
-      <h4>📅 Турнир</h4>
-      <input id="t-name" placeholder="Название турнира">
-      <select id="t-type">
-        <option value="groups">Групповой этап + Плей-офф</option>
-        <option value="playoff">Только Плей-офф</option>
-      </select>
-      <div id="t-groups">
-        <h4>Группы</h4>
-        <div id="groups-container">
-          <div class="group-box">
-            <b>Группа A</b>
-            <input class="g-team" placeholder="Команда 1">
-            <input class="g-team" placeholder="Команда 2">
-            <input class="g-team" placeholder="Команда 3">
-            <input class="g-team" placeholder="Команда 4">
-          </div>
+  <div id="p-rating" class="page active"><div class="container" id="rating-list"></div></div>
+  <div id="p-matches" class="page"><div class="container" id="matches-list"></div></div>
+  <div id="p-tournaments" class="page"><div class="container" id="tournaments-list"></div></div>
+  <div id="p-tournament" class="page"><div class="container"><span class="back-link" onclick="go('tournaments')">← К турнирам</span><div id="tournament-view"></div></div></div>
+  <div id="p-match" class="page"><div class="container"><span class="back-link" onclick="go('matches')">← К матчам</span><div id="match-view"></div></div></div>
+  <div id="p-stats" class="page"><div class="container" id="stats-list"></div></div>
+  <div id="p-team" class="page"><div class="container"><span class="back-link" onclick="go('rating')">← К рейтингу</span><div id="team-view"></div></div></div>
+  <div id="p-player" class="page"><div class="container"><span class="back-link" onclick="history.back()">← Назад</span><div id="player-view"></div></div></div>
+  
+  <!-- Админка -->
+  <div id="p-admin" class="page">
+    <div class="container">
+      <div class="admin-section">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h4 style="border:none;margin:0;padding:0;">🛠️ Админ-панель MLTV</h4>
+          <button class="btn btn-red btn-sm" onclick="logout()">Выйти</button>
         </div>
-        <button onclick="addGroup()" class="blue">+ Группа</button>
       </div>
-      <h4>Плей-офф (8 команд)</h4>
-      <div id="playoff-teams">
-        <div class="row-inputs"><input class="p-team" placeholder="1"><input class="p-team" placeholder="2"></div>
-        <div class="row-inputs"><input class="p-team" placeholder="3"><input class="p-team" placeholder="4"></div>
-        <div class="row-inputs"><input class="p-team" placeholder="5"><input class="p-team" placeholder="6"></div>
-        <div class="row-inputs"><input class="p-team" placeholder="7"><input class="p-team" placeholder="8"></div>
+
+      <div class="admin-section">
+        <h4>➕ Добавить команду</h4>
+        <div class="row"><input id="an" placeholder="Название команды"><input id="ar" placeholder="Регион" value="EU" style="max-width:70px;"></div>
+        <input id="ap" type="number" placeholder="Очки рейтинга" value="500">
+        <button class="btn btn-orange" onclick="addTeam()" style="width:100%;">Добавить команду</button>
       </div>
-      <button onclick="addTournament()">Создать турнир</button>
+
+      <div class="admin-section">
+        <h4>📋 Управление командами <span style="color:var(--text3);font-weight:400;font-size:10px;">(нажми на лого для загрузки)</span></h4>
+        <div id="admin-teams"></div>
+      </div>
+
+      <div class="admin-section">
+        <h4>👥 Составы команд</h4>
+        <div id="admin-rosters"></div>
+      </div>
+
+      <div class="admin-section">
+        <h4>🎮 Добавить матч</h4>
+        <div class="row"><select id="mt1"></select><select id="mt2"></select></div>
+        <div class="row"><input id="ms" placeholder="Счёт (16:14)"><input id="me" placeholder="Название турнира"></div>
+        <button class="btn btn-orange" onclick="addMatch()" style="width:100%;">Добавить матч</button>
+      </div>
+
+      <div class="admin-section">
+        <h4>📊 Статистика матча (K/D/A)</h4>
+        <select id="sm"></select>
+        <div id="sf"></div>
+      </div>
+
+      <div class="admin-section">
+        <h4>📅 Создать турнир с сеткой</h4>
+        <input id="tn" placeholder="Название турнира">
+        <p style="font-size:10px;color:var(--text3);margin:5px 0;">Участники плей-офф (8 команд):</p>
+        <div id="pt">
+          <div class="row"><input class="po" placeholder="1"><input class="po" placeholder="2"></div>
+          <div class="row"><input class="po" placeholder="3"><input class="po" placeholder="4"></div>
+          <div class="row"><input class="po" placeholder="5"><input class="po" placeholder="6"></div>
+<div class="row"><input class="po" placeholder="7"><input class="po" placeholder="8"></div>
+        </div>
+        <button class="btn btn-orange" onclick="addTournament()" style="width:100%;">Создать турнир</button>
+      </div>
     </div>
   </div>
 
   <script>
-    var PASSWORD = 'mltv2026';
-    var SUPABASE_URL = 'https://thlsltelqegxzpoptldd.supabase.co';
-    var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRobHNsdGVscWVneHpwb3B0bGRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MjExNDcsImV4cCI6MjEwMDk5NzE0N30.RXOkkQxZ8CWkmJZZRZvXi0J4IVyLwG5LCIpi3TXj8z0';
+    // ========== КОНФИГУРАЦИЯ ==========
+    var PW = 'mltv2026';
+    var SU = 'https://thlsltelqegxzpoptldd.supabase.co';
+    var SK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRobHNsdGVscWVneHpwb3B0bGRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MjExNDcsImV4cCI6MjEwMDk5NzE0N30.RXOkkQxZ8CWkmJZZRZvXi0J4IVyLwG5LCIpi3TXj8z0';
 
     var DB = { teams: [], matches: [], tournaments: [] };
-    var isAdmin = false;
+    var admin = false;
     var upload = null;
+    var currentPage = 'rating';
 
     function def() {
       DB.teams = [
@@ -429,403 +689,369 @@
         { name:"GamerLegion", region:"EU", points:572, logo:"", players:[] },
         { name:"Liquid", region:"NA", points:555, logo:"", players:[] }
       ];
-      DB.matches = [];
-      DB.tournaments = [];
+      DB.matches = []; DB.tournaments = [];
     }
 
     async function load() {
       try {
-        var r = await fetch(SUPABASE_URL + '/rest/v1/data?id=eq.1', {
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-        });
-        if (r.ok) {
-          var d = await r.json();
-          if (d[0] && d[0].content) {
-            var p = JSON.parse(d[0].content);
-            if (p.teams && p.teams.length > 0) { DB = p; return; }
-          }
-        }
+        var r = await fetch(SU + '/rest/v1/data?id=eq.1', { headers: { 'apikey': SK, 'Authorization': 'Bearer ' + SK } });
+        if (r.ok) { var d = await r.json(); if (d[0] && d[0].content) { var p = JSON.parse(d[0].content); if (p.teams && p.teams.length > 0) { DB = p; return; } } }
       } catch(e) {}
-      var s = localStorage.getItem('mltv_v2');
+      var s = localStorage.getItem('mltv_full_v3');
       if (s) { try { var p = JSON.parse(s); if (p.teams && p.teams.length > 0) { DB = p; return; } } catch(e) {} }
       def(); save();
     }
 
     function save() {
-      var j = JSON.stringify(DB);
-      localStorage.setItem('mltv_v2', j);
-      if (isAdmin) {
-        fetch(SUPABASE_URL + '/rest/v1/data?id=eq.1', {
-          method: 'PATCH',
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-          body: JSON.stringify({ content: j })
-        }).catch(function(){});
-      }
+      var j = JSON.stringify(DB); localStorage.setItem('mltv_full_v3', j);
+      if (admin) fetch(SU + '/rest/v1/data?id=eq.1', { method: 'PATCH', headers: { 'apikey': SK, 'Authorization': 'Bearer ' + SK, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' }, body: JSON.stringify({ content: j }) }).catch(function(){});
     }
 
     setInterval(async function() {
       try {
-        var r = await fetch(SUPABASE_URL + '/rest/v1/data?id=eq.1', {
-          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-        });
-        if (r.ok) {
-          var d = await r.json();
-          if (d[0] && d[0].content) {
-            var p = JSON.parse(d[0].content);
-            if (JSON.stringify(p) !== JSON.stringify(DB)) { DB = p; refreshView(); }
-          }
-        }
+        var r = await fetch(SU + '/rest/v1/data?id=eq.1', { headers: { 'apikey': SK, 'Authorization': 'Bearer ' + SK } });
+        if (r.ok) { var d = await r.json(); if (d[0] && d[0].content) { var p = JSON.parse(d[0].content); if (JSON.stringify(p) !== JSON.stringify(DB)) { DB = p; renderPage(); } } }
       } catch(e) {}
     }, 5000);
 
-    function refreshView() {
-      if (document.getElementById('page-rating').classList.contains('show-page')) buildRating();
-      if (document.getElementById('page-matches').classList.contains('show-page')) buildMatches();
-      if (document.getElementById('page-tournaments').classList.contains('show-page')) buildTournaments();
-      if (document.getElementById('page-stats').classList.contains('show-page')) buildStats();
+    function renderPage() {
+      if (currentPage === 'rating') rating();
+      if (currentPage === 'matches') matches();
+      if (currentPage === 'tournaments') tournaments();
+      if (currentPage === 'stats') stats();
     }
 
     function esc(s) { return s ? String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+    function ft(n) { for (var i = 0; i < DB.teams.length; i++) if (DB.teams[i].name === n) return DB.teams[i]; return null; }
 
-    function logo(t, s) {
+    function logo(t, sz) {
       if (t && t.logo && t.logo.length > 100) return '<img src="' + t.logo + '" style="width:100%;height:100%;object-fit:cover;">';
       var i = (t && t.name) ? t.name.substring(0,2).toUpperCase() : '??';
-      var fs = s === 'big' ? '26px' : '12px';
-      return '<span style="font-size:' + fs + ';font-weight:bold;">' + esc(i) + '</span>';
+      var fs = sz === 'lg' ? '20px' : '11px';
+      return '<span style="font-size:' + fs + ';font-weight:700;">' + esc(i) + '</span>';
     }
 
-    function ava(p, cl, ti, pi) {
-      var c = cl ? 'player-avatar' : 'player-avatar';
+    function ava(p, cl, ti, pi, sz) {
       var o = cl ? ' onclick="upPhoto(' + ti + ',' + pi + ')"' : '';
-      if (p && p.photo && p.photo.length > 100) return '<div class="' + c + '"' + o + '><img src="' + p.photo + '" style="width:100%;height:100%;object-fit:cover;"></div>';
-      var i = (p && p.nick) ? p.nick[0].toUpperCase() : '?';
-      return '<div class="' + c + '"' + o + '><span style="font-size:16px;">' + esc(i) + '</span></div>';
+      var cls = sz === 'lg' ? 'player-avatar-lg' : 'player-avatar-sm';
+      if (p && p.photo && p.photo.length > 100) return '<div class="' + cls + '"' + o + '><img src="' + p.photo + '" style="width:100%;height:100%;object-fit:cover;"></div>';
+      return '<div class="' + cls + '"' + o + '>' + esc((p&&p.nick)?p.nick[0].toUpperCase():'?') + '</div>';
     }
 
-    function hide() {
-      var ps = ['page-rating','page-matches','page-tournaments','page-tournament','page-match','page-stats','page-team','page-admin','page-login'];
-      for (var i = 0; i < ps.length; i++) document.getElementById(ps[i]).classList.remove('show-page');
-      var ts = ['tab-rating','tab-matches','tab-tournaments','tab-stats'];
-      for (var j = 0; j < ts.length; j++) document.getElementById(ts[j]).classList.remove('active-tab');
-    }
-
-    function showRating() { hide(); document.getElementById('page-rating').classList.add('show-page'); document.getElementById('tab-rating').classList.add('active-tab'); buildRating(); }
-    function showMatches() { hide(); document.getElementById('page-matches').classList.add('show-page'); document.getElementById('tab-matches').classList.add('active-tab'); buildMatches(); }
-    function showTournaments() { hide(); document.getElementById('page-tournaments').classList.add('show-page'); document.getElementById('tab-tournaments').classList.add('active-tab'); buildTournaments(); }
-    function showStats() { hide(); document.getElementById('page-stats').classList.add('show-page'); document.getElementById('tab-stats').classList.add('active-tab'); buildStats(); }
-    function showTeam(i) { hide(); document.getElementById('page-team').classList.add('show-page'); buildTeam(i); }
-    function showTournament(i) { hide(); document.getElementById('page-tournament').classList.add('show-page'); buildTournament(i); }
-    function showMatch(i) { hide(); document.getElementById('page-match').classList.add('show-page'); buildMatch(i); }
-
-    function openAdmin() { if (isAdmin) { showAdmin(); return; } hide(); document.getElementById('page-login').classList.add('show-page'); }
-    function login() { if (document.getElementById('admin-password').value === PASSWORD) { isAdmin = true; localStorage.setItem('mltv_a', '1'); showAdmin(); } else alert('Неверный пароль!'); }
-    function logout() { isAdmin = false; localStorage.removeItem('mltv_a'); showRating(); }
-    function showAdmin() { hide(); document.getElementById('page-admin').classList.add('show-page'); buildAdminTeams(); buildAdminRosters(); updateSelects(); updateStatsSelect(); }
-
-    function getStats(n) {
-      var s = { m: 0, k: 0, d: 0, a: 0, kd: '0.00', r: '0.00' };
+    function gs(n) {
+      var s = { m:0, k:0, d:0, a:0, kd:'0.00', r:'0.00', kpr:'0.00', dpr:'0.00', apr:'0.00' };
       for (var i = 0; i < DB.matches.length; i++) {
-        var m = DB.matches[i];
-        if (m.stats) for (var j = 0; j < m.stats.length; j++) if (m.stats[j].p === n) { s.m++; s.k += m.stats[j].k||0; s.d += m.stats[j].d||0; s.a += m.stats[j].a||0; }
+        var m = DB.matches[i]; if (m.stats) for (var j = 0; j < m.stats.length; j++) if (m.stats[j].p === n) { s.m++; s.k += m.stats[j].k||0; s.d += m.stats[j].d||0; s.a += m.stats[j].a||0; }
       }
-      if (s.m > 0) { s.kd = (s.k/Math.max(1,s.d)).toFixed(2); s.r = Math.max(0,((s.k+0.7*s.a-0.3*s.d)/s.m/2)).toFixed(2); }
+      if (s.m > 0) {
+        s.kd = (s.k/Math.max(1,s.d)).toFixed(2);
+        s.kpr = (s.k/s.m).toFixed(2);
+        s.dpr = (s.d/s.m).toFixed(2);
+        s.apr = (s.a/s.m).toFixed(2);
+        s.r = Math.max(0,((s.k+0.7*s.a-0.3*s.d)/s.m/2)).toFixed(2);
+      }
       return s;
     }
 
-    function findTeam(n) { for (var i = 0; i < DB.teams.length; i++) if (DB.teams[i].name === n) return DB.teams[i]; return null; }
+    function go(p) {
+      currentPage = p;
+      document.querySelectorAll('.page').forEach(function(x){ x.classList.remove('active'); });
+      document.querySelectorAll('.navbar button').forEach(function(x){ x.classList.remove('active'); });
+      document.getElementById('p-' + p).classList.add('active');
+      var btn = document.querySelector('[data-page="' + p + '"]');
+      if (btn) btn.classList.add('active');
+      
+      if (p === 'rating') rating();
+      if (p === 'matches') matches();
+      if (p === 'tournaments') tournaments();
+      if (p === 'stats') stats();
+      if (p === 'admin') showAdminPage();
+    }
 
-    function buildRating() {
+    function openAdmin() { if (admin) { go('admin'); return; } go('login'); }
+    function login() { if (document.getElementById('pw').value === PW) { admin = true; localStorage.setItem('mltv_ad_v3', '1'); go('admin'); } else alert('Неверный пароль!'); }
+    function logout() { admin = false; localStorage.removeItem('mltv_ad_v3'); go('rating'); }
+
+    function rating() {
       DB.teams.sort(function(a,b){ return b.points - a.points; });
-      var h = '';
+      var h = '<div class="section-title"><span class="icon">🏆</span> Топ-20 команд <span class="count">' + DB.teams.length + ' команд</span></div>';
+      h += '<div class="ranking-card"><div class="ranking-header"><span>#</span><span>Команда</span><span style="text-align:right;">Очки</span></div>';
       for (var i = 0; i < DB.teams.length; i++) {
         var t = DB.teams[i];
-        h += '<div class="team-row" onclick="showTeam(' + i + ')"><div class="rank-num">#' + (i+1) + '</div><div class="team-logo">' + logo(t) + '</div><div class="team-info"><div class="team-name-text">' + esc(t.name) + '</div><div class="team-region-text">' + esc(t.region) + '</div></div><div class="team-points-text">' + t.points + '</div></div>';
+        h += '<div class="team-row" onclick="showTeam(' + i + ')"><div class="rank">' + (i+1) + '</div><div class="team-cell"><div class="team-logo">' + logo(t) + '</div><div><div class="team-name">' + esc(t.name) + '</div><div class="team-region">' + esc(t.region) + '</div></div></div><div class="points">' + t.points + ' pts</div></div>';
       }
-      document.getElementById('rating-container').innerHTML = h;
+      h += '</div>';
+      document.getElementById('rating-list').innerHTML = h;
     }
 
-    function buildTeam(i) {
-      var t = DB.teams[i]; if (!t) return; if (!t.players) t.players = [];
-      var h = '<div class="logo-big">' + logo(t,'big') + '</div><h2 style="text-align:center;">' + esc(t.name) + '</h2><p style="text-align:center;color:#999;">' + esc(t.region) + ' | Очки: ' + t.points + '</p><h3>Состав:</h3>';
-      if (!t.players.length) h += '<p style="color:#666;">Нет игроков</p>';
-      else for (var p = 0; p < t.players.length; p++) {
-        var pl = t.players[p], s = getStats(pl.nick);
-        h += '<div class="player-box"><div class="player-top">' + ava(pl,false,i,p) + '<div style="flex:1;"><b>' + esc(pl.nick) + '</b><br><span style="color:#999;">' + esc(pl.role) + '</span></div><div style="text-align:right;font-size:11px;color:#ff9500;">М: ' + s.m + '<br>K/D: ' + s.kd + '<br>Рейтинг: ' + s.r + '</div></div></div>';
+    function showTeam(i) {
+      go('team'); var t = DB.teams[i]; if (!t) return; if (!t.players) t.players = [];
+      var h = '<div style="text-align:center;padding:10px 0;">';
+      h += '<div style="display:inline-block;width:64px;height:64px;border-radius:8px;background:var(--bg4);overflow:hidden;border:2px solid var(--orange);">' + logo(t,'lg') + '</div>';
+      h += '<h2 style="margin-top:8px;">' + esc(t.name) + '</h2>';
+      h += '<p style="color:var(--text3);">' + esc(t.region) + ' • <span style="color:var(--orange);">' + t.points + ' очков</span></p>';
+      h += '</div>';
+      h += '<div class="section-title"><span class="icon">👥</span> Состав команды</div>';
+      if (!t.players.length) h += '<div class="empty-state"><div class="icon">👤</div><p>Состав не добавлен</p></div>';
+      else {
+        h += '<div class="ranking-card">';
+        for (var p = 0; p < t.players.length; p++) {
+          var pl = t.players[p], s = gs(pl.nick);
+          h += '<div class="team-row" onclick="showPlayer(' + i + ',' + p + ')" style="grid-template-columns:40px 1fr 100px;">';
+          h += ava(pl,false,i,p,'sm');
+          h += '<div><b>' + esc(pl.nick) + '</b><br><span style="font-size:10px;color:var(--text3);">' + esc(pl.role) + '</span></div>';
+          h += '<div style="text-align:right;font-size:11px;"><span style="color:var(--orange);">' + s.r + '</span> <span style="color:var(--text3);">• ' + s.m + ' матчей</span></div>';
+          h += '</div>';
+        }
+        h += '</div>';
       }
-      document.getElementById('team-content').innerHTML = h;
+      document.getElementById('team-view').innerHTML = h;
     }
 
-    function buildMatches() {
-      var h = '';
-      if (!DB.matches.length) h = '<p style="color:#999;">Матчей нет</p>';
-      else for (var i = DB.matches.length-1; i >= 0; i--) {
-        var m = DB.matches[i], t1 = findTeam(m.t1), t2 = findTeam(m.t2);
-        h += '<div class="card" onclick="showMatch(' + i + ')" style="cursor:pointer;">';
-        h += '<div style="color:#ff9500;font-size:11px;text-align:center;">' + esc(m.event||'Турнир') + ' • ' + esc(m.date) + '</div>';
-        h += '<div style="display:flex;align-items:center;gap:8px;margin:6px 0;">';
-        h += '<div style="flex:1;display:flex;align-items:center;gap:6px;font-weight:bold;"><div class="team-logo-sm">' + logo(t1) + '</div>' + esc(m.t1) + '</div>';
-        h += '<div style="font-size:18px;font-weight:bold;">' + esc(m.score) + '</div>';
-        h += '<div style="flex:1;display:flex;align-items:center;gap:6px;font-weight:bold;justify-content:flex-end;text-align:right;">' + esc(m.t2) + '<div class="team-logo-sm">' + logo(t2) + '</div></div>';
-        h += '</div></div>';
-      }
-      document.getElementById('matches-container').innerHTML = h;
-    }
-
-    function buildMatch(i) {
-      var m = DB.matches[i]; if (!m) return;
-      var t1 = findTeam(m.t1), t2 = findTeam(m.t2);
-      var h = '<h2 style="text-align:center;">' + esc(m.t1) + ' vs ' + esc(m.t2) + '</h2>';
-      h += '<p style="text-align:center;color:#999;">' + esc(m.event||'Турнир') + ' • ' + esc(m.date) + '</p>';
-      h += '<div style="text-align:center;font-size:36px;font-weight:bold;margin:15px 0;">' + esc(m.score) + '</div>';
+    function showPlayer(ti, pi) {
+      go('player'); var t = DB.teams[ti], pl = t.players[pi]; if (!pl) return;
+      var s = gs(pl.nick);
+      var h = '<div class="player-profile">' + ava(pl,false,ti,pi,'lg') + '<h2>' + esc(pl.nick) + '</h2><p style="color:var(--text3);">' + esc(pl.role) + ' • ' + esc(t.name) + '</p></div>';
       
-      h += '<h3>📊 Статистика игроков</h3>';
-      if (!m.stats || !m.stats.length) { h += '<p style="color:#666;">Нет статистики</p>'; }
+      h += '<div class="stats-section"><h3>📊 Общая статистика</h3>';
+      h += '<table class="stats-table"><tr><th>Матчи</th><th>K/D</th><th>Рейтинг</th><th>KPR</th><th>DPR</th><th>Kills</th><th>Deaths</th></tr>';
+      h += '<tr><td>' + s.m + '</td><td class="highlight">' + s.kd + '</td><td class="highlight">' + s.r + '</td><td>' + s.kpr + '</td><td>' + s.dpr + '</td><td>' + s.k + '</td><td>' + s.d + '</td></tr></table></div>';
+      
+      var pm = [];
+      for (var i = 0; i < DB.matches.length; i++) {
+        var m = DB.matches[i]; if (m.stats) for (var j = 0; j < m.stats.length; j++) if (m.stats[j].p === pl.nick) pm.push({ m: m, s: m.stats[j] });
+      }
+      if (pm.length) {
+        h += '<div class="stats-section"><h3>🎮 История матчей</h3>';
+        for (var k = pm.length-1; k >= Math.max(0,pm.length-10); k--) {
+          h += '<div style="padding:8px 14px;border-bottom:1px solid var(--border);">';
+          h += '<span style="color:var(--text3);font-size:10px;">' + esc(pm[k].m.date) + '</span> ';
+          h += '<b>' + esc(pm[k].m.t1) + ' ' + esc(pm[k].m.score) + ' ' + esc(pm[k].m.t2) + '</b> ';
+          h += '<span style="color:var(--orange);">K:' + pm[k].s.k + ' D:' + pm[k].s.d + ' A:' + (pm[k].s.a||0) + '</span>';
+          h += '</div>';
+        }
+        h += '</div>';
+      }
+      
+      document.getElementById('player-view').innerHTML = h;
+    }
+
+    function matches() {
+      var h = '<div class="section-title"><span class="icon">🎮</span> Матчи <span class="count">' + DB.matches.length + '</span></div>';
+      if (!DB.matches.length) h += '<div class="empty-state"><div class="icon">🎯</div><p>Матчей пока нет</p></div>';
+      else for (var i = DB.matches.length-1; i >= 0; i--) {
+        var m = DB.matches[i], t1 = ft(m.t1), t2 = ft(m.t2);
+        h += '<div class="match-card" onclick="showMatch(' + i + ')">';
+        h += '<div class="match-header"><span class="tournament-tag">' + esc(m.event||'Турнир') + '</span><span>' + esc(m.date) + '</span></div>';
+        h += '<div class="match-body">';
+        h += '<div class="match-team"><div class="team-logo lg">' + logo(t1) + '</div><span class="team-name">' + esc(m.t1) + '</span></div>';
+        h += '<div class="match-score-box"><div class="match-score">' + esc(m.score) + '</div></div>';
+        h += '<div class="match-team right"><span class="team-name">' + esc(m.t2) + '</span><div class="team-logo lg">' + logo(t2) + '</div></div>';
+        h += '</div>';
+        if (m.stats && m.stats.length) h += '<div class="match-footer">📊 Статистика добавлена (' + m.stats.length + ' игроков)</div>';
+        h += '</div>';
+      }
+      document.getElementById('matches-list').innerHTML = h;
+    }
+
+    function showMatch(i) {
+      go('match'); var m = DB.matches[i]; if (!m) return;
+      var t1 = ft(m.t1), t2 = ft(m.t2);
+      var h = '<div class="match-detail-header">';
+      h += '<p style="color:var(--text3);">' + esc(m.event||'Турнир') + ' • ' + esc(m.date) + '</p>';
+      h += '<div class="vs"><div class="team-block"><div class="team-logo" style="width:56px;height:56px;margin:0 auto;">' + logo(t1,'lg') + '</div><p style="font-weight:700;margin-top:5px;">' + esc(m.t1) + '</p></div>';
+      h += '<div class="score-big">' + esc(m.score) + '</div>';
+      h += '<div class="team-block"><div class="team-logo" style="width:56px;height:56px;margin:0 auto;">' + logo(t2,'lg') + '</div><p style="font-weight:700;margin-top:5px;">' + esc(m.t2) + '</p></div></div>';
+      h += '</div>';
+      
+      if (!m.stats || !m.stats.length) { h += '<div class="empty-state"><p>Статистика матча не добавлена</p></div>'; }
       else {
         var s1 = [], s2 = [];
         for (var j = 0; j < m.stats.length; j++) {
-          var st = m.stats[j];
-          var entry = { p: st.p, k: st.k||0, d: st.d||0, a: st.a||0, kd: (st.d>0?(st.k/st.d).toFixed(2):st.k.toFixed(2)) };
-          var p1 = t1 && t1.players ? t1.players.find(function(x){ return x.nick === st.p; }) : null;
-          var p2 = t2 && t2.players ? t2.players.find(function(x){ return x.nick === st.p; }) : null;
-          if (p1) s1.push(entry); else if (p2) s2.push(entry);
+          var st = m.stats[j], e = { p: st.p, k: st.k||0, d: st.d||0, a: st.a||0, kd: (st.d>0?(st.k/st.d).toFixed(2):st.k.toFixed(2)) };
+          if (t1&&t1.players&&t1.players.find(function(x){return x.nick===st.p;})) s1.push(e); else if (t2&&t2.players&&t2.players.find(function(x){return x.nick===st.p;})) s2.push(e);
         }
-        
-        h += '<div style="display:flex;gap:10px;">';
-        h += '<div style="flex:1;"><h4>' + esc(m.t1) + '</h4><table class="stats-table"><tr><th>Игрок</th><th>K</th><th>D</th><th>A</th><th>K/D</th></tr>';
-        for (var k = 0; k < s1.length; k++) h += '<tr><td>' + esc(s1[k].p) + '</td><td>' + s1[k].k + '</td><td>' + s1[k].d + '</td><td>' + s1[k].a + '</td><td>' + s1[k].kd + '</td></tr>';
+        h += '<div class="stats-section"><h3>📊 Статистика матча</h3><div class="stats-grid">';
+        h += '<div><h4 style="padding:10px;color:var(--orange);">' + esc(m.t1) + '</h4><table class="stats-table"><tr><th>Игрок</th><th>K</th><th>D</th><th>A</th><th>K/D</th></tr>';
+        for (var k = 0; k < s1.length; k++) h += '<tr><td>' + esc(s1[k].p) + '</td><td>' + s1[k].k + '</td><td>' + s1[k].d + '</td><td>' + s1[k].a + '</td><td class="highlight">' + s1[k].kd + '</td></tr>';
         h += '</table></div>';
-        
-        h += '<div style="flex:1;"><h4>' + esc(m.t2) + '</h4><table class="stats-table"><tr><th>Игрок</th><th>K</th><th>D</th><th>A</th><th>K/D</th></tr>';
-        for (var l = 0; l < s2.length; l++) h += '<tr><td>' + esc(s2[l].p) + '</td><td>' + s2[l].k + '</td><td>' + s2[l].d + '</td><td>' + s2[l].a + '</td><td>' + s2[l].kd + '</td></tr>';
-        h += '</table></div>';
-        h += '</div>';
+        h += '<div><h4 style="padding:10px;color:var(--orange);">' + esc(m.t2) + '</h4><table class="stats-table"><tr><th>Игрок</th><th>K</th><th>D</th><th>A</th><th>K/D</th></tr>';
+        for (var l = 0; l < s2.length; l++) h += '<tr><td>' + esc(s2[l].p) + '</td><td>' + s2[l].k + '</td><td>' + s2[l].d + '</td><td>' + s2[l].a + '</td><td class="highlight">' + s2[l].kd + '</td></tr>';
+        h += '</table></div></div></div>';
       }
-      document.getElementById('match-content').innerHTML = h;
+      document.getElementById('match-view').innerHTML = h;
     }
 
-    function buildTournaments() {
-      var h = '';
-      if (!DB.tournaments.length) h = '<p style="color:#999;">Турниров нет</p>';
+    function tournaments() {
+      var h = '<div class="section-title"><span class="icon">📅</span> Турниры <span class="count">' + DB.tournaments.length + '</span></div>';
+      if (!DB.tournaments.length) h += '<div class="empty-state"><div class="icon">🏟️</div><p>Турниров пока нет</p></div>';
       else for (var i = 0; i < DB.tournaments.length; i++) {
         var t = DB.tournaments[i];
-        h += '<div class="card" onclick="showTournament(' + i + ')" style="cursor:pointer;"><div style="font-weight:bold;">' + esc(t.name) + '</div><div style="color:#999;font-size:12px;">' + (t.type==='groups'?'Группы + Плей-офф':'Плей-офф') + '</div></div>';
+        h += '<div class="tournament-card" onclick="showTournament(' + i + ')"><h3>' + esc(t.name) + '</h3><div class="meta">Плей-офф</div><div class="teams-count">' + (t.bracket?t.bracket[0].length*2:'0') + ' команд • ' + (t.bracket?t.bracket.length:'0') + ' раунда</div></div>';
       }
-      document.getElementById('tournaments-container').innerHTML = h;
+      document.getElementById('tournaments-list').innerHTML = h;
     }
 
-    function buildTournament(i) {
-      var t = DB.tournaments[i]; if (!t) return;
-      var h = '<h2>' + esc(t.name) + '</h2>';
-      
-      if (t.groups && t.groups.length) {
-        h += '<h3>📊 Групповой этап</h3>';
-        for (var g = 0; g < t.groups.length; g++) {
-          var gr = t.groups[g], letters = 'ABCDEFGH';
-          h += '<div class="group-box"><h4>Группа ' + (letters[g]||'?') + '</h4>';
-          h += '<table class="stats-table"><tr><th>#</th><th>Команда</th><th>Игры</th><th>W</th><th>Очки</th></tr>';
-          if (gr.teams) for (var x = 0; x < gr.teams.length; x++) {
-            var tm = gr.teams[x];
-            h += '<tr><td>' + (x+1) + '</td><td>' + esc(tm.name) + '</td><td>' + (tm.p||0) + '</td><td>' + (tm.w||0) + '</td><td>' + (tm.pts||0) + '</td></tr>';
-          }
-          h += '</table></div>';
-        }
-      }
-      
+    function showTournament(i) {
+      go('tournament'); var t = DB.tournaments[i]; if (!t) return;
+      var h = '<h2 style="margin-bottom:5px;">' + esc(t.name) + '</h2>';
       if (t.bracket && t.bracket.length) {
-        h += '<h3>🏆 Плей-офф</h3>';
-        var rn = ['1/4 финала','1/2 финала','Финал'];
+        h += '<div class="section-title"><span class="icon">🏆</span> Сетка плей-офф</div><div class="bracket-container">';
+        var rn = ['1/4 финала','Полуфинал','Финал'];
         for (var r = 0; r < t.bracket.length; r++) {
-          var rd = t.bracket[r];
-          h += '<div class="bracket-round"><h4>' + (rn[r]||'Раунд') + '</h4>';
-          for (var m = 0; m < rd.length; m++) {
-            var bm = rd[m];
-            h += '<div class="bracket-match"><div class="bracket-team' + (bm.w===1?' winner':'') + '">' + esc(bm.t1||'TBD') + '</div><div class="bracket-score">' + esc(bm.s||'vs') + '</div><div class="bracket-team' + (bm.w===2?' winner':'') + '">' + esc(bm.t2||'TBD') + '</div></div>';
+          h += '<div class="bracket-round"><h4>' + (rn[r]||'Раунд '+(r+1)) + '</h4>';
+          for (var m = 0; m < t.bracket[r].length; m++) {
+            var bm = t.bracket[r][m];
+            h += '<div class="bracket-match"><span class="bracket-team' + (bm.w===1?' win':'') + '">' + esc(bm.t1||'TBD') + '</span><span class="bracket-vs">' + esc(bm.s||'vs') + '</span><span class="bracket-team' + (bm.w===2?' win':'') + '">' + esc(bm.t2||'TBD') + '</span></div>';
           }
           h += '</div>';
         }
+        h += '</div>';
       }
-      
-      // Матчи турнира
       var tms = DB.matches.filter(function(m){ return m.event === t.name; });
       if (tms.length) {
-        h += '<h3>🎮 Матчи</h3>';
+        h += '<div class="section-title"><span class="icon">🎮</span> Матчи турнира</div>';
         for (var mi = tms.length-1; mi >= 0; mi--) {
           var tm = tms[mi];
-          h += '<div class="card" onclick="showMatch(' + DB.matches.indexOf(tm) + ')" style="cursor:pointer;">';
-          h += '<div style="display:flex;align-items:center;justify-content:space-between;font-weight:bold;">';
-          h += '<span>' + esc(tm.t1) + '</span><span>' + esc(tm.score) + '</span><span>' + esc(tm.t2) + '</span>';
-          h += '</div><div style="color:#666;font-size:11px;text-align:center;">' + esc(tm.date) + '</div></div>';
+          h += '<div class="match-card" onclick="showMatch(' + DB.matches.indexOf(tm) + ')"><div class="match-body"><div class="match-team">' + esc(tm.t1) + '</div><div class="match-score-box"><div class="match-score">' + esc(tm.score) + '</div></div><div class="match-team right">' + esc(tm.t2) + '</div></div></div>';
         }
       }
-      
-      document.getElementById('tournament-content').innerHTML = h;
+      document.getElementById('tournament-view').innerHTML = h;
     }
 
-    function buildStats() {
+    function stats() {
       var all = [];
-      for (var i = 0; i < DB.teams.length; i++) for (var j = 0; j < DB.teams[i].players.length; j++) {
-        var s = getStats(DB.teams[i].players[j].nick);
-        if (s.m > 0) all.push({ n: DB.teams[i].players[j].nick, t: DB.teams[i].name, s: s });
-      }
+      for (var i = 0; i < DB.teams.length; i++) for (var j = 0; j < DB.teams[i].players.length; j++) { var s = gs(DB.teams[i].players[j].nick); if (s.m > 0) all.push({ n: DB.teams[i].players[j].nick, t: DB.teams[i].name, s: s }); }
       all.sort(function(a,b){ return parseFloat(b.s.r)-parseFloat(a.s.r); });
-      var h = '<h3>📊 Рейтинг игроков</h3>';
-      if (!all.length) h += '<p style="color:#666;">Нет данных</p>';
+      var h = '<div class="section-title"><span class="icon">📊</span> Рейтинг игроков <span class="count">' + all.length + ' игроков</span></div>';
+      if (!all.length) h += '<div class="empty-state"><div class="icon">📉</div><p>Нет данных. Добавьте статистику матчей.</p></div>';
       else {
-        h += '<table class="stats-table"><tr><th>#</th><th>Игрок</th><th>Команда</th><th>М</th><th>K/D</th><th>Рейтинг</th></tr>';
-        for (var k = 0; k < all.length; k++) h += '<tr><td>' + (k+1) + '</td><td>' + esc(all[k].n) + '</td><td>' + esc(all[k].t) + '</td><td>' + all[k].s.m + '</td><td>' + all[k].s.kd + '</td><td style="color:#ff9500;">' + all[k].s.r + '</td></tr>';
-        h += '</table>';
+        h += '<div class="ranking-card"><div class="ranking-header"><span>#</span><span>Игрок</span><span style="text-align:right;">Рейтинг</span></div>';
+        for (var k = 0; k < all.length; k++) {
+          h += '<div class="team-row"><div class="rank">' + (k+1) + '</div><div class="team-cell"><div><b>' + esc(all[k].n) + '</b><br><span style="font-size:10px;color:var(--text3);">' + esc(all[k].t) + ' • ' + all[k].s.m + ' матчей</span></div></div><div class="points">' + all[k].s.r + '</div></div>';
+        }
+        h += '</div>';
       }
-      document.getElementById('stats-container').innerHTML = h;
+      document.getElementById('stats-list').innerHTML = h;
     }
 
-    // АДМИНКА
-    function upLogo(i) { upload = { t: 'logo', i: i }; document.getElementById('hiddenFileInput').click(); }
-    function upPhoto(i,p) { upload = { t: 'photo', i: i, p: p }; document.getElementById('hiddenFileInput').click(); }
+    function upLogo(i) { upload = { t: 'logo', i: i }; document.getElementById('fileInput').click(); }
+    function upPhoto(i,p) { upload = { t: 'photo', i: i, p: p }; document.getElementById('fileInput').click(); }
 
-    document.getElementById('hiddenFileInput').addEventListener('change', function(e) {
-      if (!upload || !isAdmin) return;
-      var f = e.target.files[0]; if (!f) return;
+    document.getElementById('fileInput').addEventListener('change', function(e) {
+      if (!upload || !admin) return; var f = e.target.files[0]; if (!f) return;
       var r = new FileReader();
       r.onload = function(ev) {
         if (upload.t === 'logo') DB.teams[upload.i].logo = ev.target.result;
         else if (upload.t === 'photo') DB.teams[upload.i].players[upload.p].photo = ev.target.result;
-        save(); buildAdminTeams(); buildAdminRosters(); buildRating(); upload = null;
+        save(); buildAT(); buildAR(); rating(); upload = null;
       };
       r.readAsDataURL(f); e.target.value = '';
     });
 
-    function buildAdminTeams() {
-      if (!isAdmin) return;
-      var h = '';
+    function buildAT() {
+      if (!admin) return; var h = '';
       for (var i = 0; i < DB.teams.length; i++) {
         var t = DB.teams[i];
-        h += '<div style="background:#0a0a1f;padding:10px;border-radius:10px;margin-bottom:8px;">';
-        h += '<div class="admin-logo-preview" onclick="upLogo(' + i + ')">' + logo(t) + '</div>';
-        h += '<div style="display:flex;gap:4px;align-items:center;"><span>#' + (i+1) + '</span>';
+        h += '<div style="background:var(--bg);padding:8px;border-radius:5px;margin-bottom:6px;border:1px solid var(--border);">';
+        h += '<div style="display:flex;align-items:center;gap:8px;"><div class="team-logo" onclick="upLogo(' + i + ')" style="cursor:pointer;width:32px;height:32px;">' + logo(t) + '</div>';
         h += '<input value="' + esc(t.name) + '" onchange="uf(' + i + ',\'name\',this.value)" style="flex:2;margin:0;padding:6px;">';
         h += '<input value="' + esc(t.region) + '" onchange="uf(' + i + ',\'region\',this.value)" style="width:50px;margin:0;padding:6px;">';
-        h += '<input type="number" value="' + t.points + '" onchange="uf(' + i + ',\'points\',parseInt(this.value)||0)" style="width:65px;margin:0;padding:6px;"></div>';
-        h += '<div style="display:flex;gap:3px;margin-top:4px;"><button onclick="mu(' + i + ')" style="flex:1;font-size:11px;padding:4px;">▲</button><button onclick="md(' + i + ')" style="flex:1;font-size:11px;padding:4px;">▼</button><button class="red" onclick="rt(' + i + ')" style="flex:1;font-size:11px;padding:4px;">✕</button></div></div>';
+        h += '<input type="number" value="' + t.points + '" onchange="uf(' + i + ',\'points\',parseInt(this.value)||0)" style="width:60px;margin:0;padding:6px;"></div>';
+        h += '<div style="display:flex;gap:3px;margin-top:4px;"><button class="btn btn-outline btn-xs" onclick="mu(' + i + )" style="flex:1;">▲</button><button class="btn btn-outline btn-xs" onclick="md(' + i + ')" style="flex:1;">▼</button><button class="btn btn-red btn-xs" onclick="rt(' + i + ')" style="flex:1;">✕</button></div></div>';
       }
       document.getElementById('admin-teams').innerHTML = h;
     }
 
-    function uf(i,f,v) { DB.teams[i][f] = (f==='points'?parseInt(v)||0:v); save(); buildRating(); }
+    function uf(i,f,v) { DB.teams[i][f] = (f==='points'?parseInt(v)||0:v); save(); rating(); }
     function mu(i) { if(i<=0)return; var t=DB.teams[i];DB.teams[i]=DB.teams[i-1];DB.teams[i-1]=t;save();ra(); }
     function md(i) { if(i>=DB.teams.length-1)return; var t=DB.teams[i];DB.teams[i]=DB.teams[i+1];DB.teams[i+1]=t;save();ra(); }
     function rt(i) { if(DB.teams.length<=1)return; if(confirm('Удалить '+DB.teams[i].name+'?')){DB.teams.splice(i,1);save();ra();} }
-    function ra() { buildRating(); buildAdminTeams(); buildAdminRosters(); updateSelects(); updateStatsSelect(); }
+    function ra() { rating(); buildAT(); buildAR(); us(); uss(); }
 
-    function buildAdminRosters() {
-      if (!isAdmin) return;
-      var h = '';
+    function buildAR() {
+      if (!admin) return; var h = '';
       for (var i = 0; i < DB.teams.length; i++) {
         var t = DB.teams[i]; if (!t.players) t.players = [];
-        h += '<div style="background:#0a0a1f;padding:10px;border-radius:10px;margin-bottom:8px;">';
-        h += '<div style="display:flex;justify-content:space-between;"><b>' + esc(t.name) + '</b><button class="green" onclick="ap(' + i + ')" style="padding:5px 10px;font-size:11px;">+ Игрок</button></div>';
+        h += '<div style="background:var(--bg);padding:8px;border-radius:5px;margin-bottom:6px;border:1px solid var(--border);">';
+        h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><b style="font-size:12px;">' + esc(t.name) + '</b><button class="btn btn-green btn-xs" onclick="ap(' + i + ')">+ Игрок</button></div>';
         for (var p = 0; p < t.players.length; p++) {
           var pl = t.players[p];
-          h += '<div style="display:flex;gap:4px;align-items:center;margin-top:4px;background:#1a1a2e;padding:5px;border-radius:6px;">';
-          h += ava(pl,true,i,p);
-          h += '<input value="' + esc(pl.nick) + '" onchange="up(' + i + ',' + p + ',\'nick\',this.value)" style="flex:2;margin:0;padding:5px;">';
-          h += '<input value="' + esc(pl.role) + '" onchange="up(' + i + ',' + p + ',\'role\',this.value)" style="flex:1;margin:0;padding:5px;">';
-          h += '<button class="red" onclick="dp(' + i + ',' + p + ')" style="padding:3px 7px;font-size:11px;">✕</button></div>';
+          h += '<div style="display:flex;gap:4px;align-items:center;margin-top:4px;background:var(--bg2);padding:4px;border-radius:3px;">' + ava(pl,true,i,p,'sm') + '<input value="' + esc(pl.nick) + '" onchange="up(' + i + ',' + p + ',\'nick\',this.value)" style="flex:2;margin:0;padding:5px;font-size:11px;"><input value="' + esc(pl.role) + '" onchange="up(' + i + ',' + p + ',\'role\',this.value)" style="flex:1;margin:0;padding:5px;font-size:11px;"><button class="btn btn-red btn-xs" onclick="dp(' + i + ',' + p + ')">✕</button></div>';
         }
         h += '</div>';
       }
       document.getElementById('admin-rosters').innerHTML = h;
     }
 
-    function ap(i) { DB.teams[i].players.push({nick:'Игрок',role:'Роль',photo:''}); save(); buildAdminRosters(); }
+    function ap(i) { DB.teams[i].players.push({nick:'Игрок',role:'Роль',photo:''}); save(); buildAR(); }
     function up(i,p,f,v) { DB.teams[i].players[p][f] = v; save(); }
-    function dp(i,p) { DB.teams[i].players.splice(p,1); save(); buildAdminRosters(); }
+    function dp(i,p) { DB.teams[i].players.splice(p,1); save(); buildAR(); }
 
-    function updateSelects() {
-      var o = ''; for (var i = 0; i < DB.teams.length; i++) o += '<option>' + esc(DB.teams[i].name) + '</option>';
-      document.getElementById('m-t1').innerHTML = o; document.getElementById('m-t2').innerHTML = o;
-    }
+    function us() { var o = ''; for (var i = 0; i < DB.teams.length; i++) o += '<option>' + esc(DB.teams[i].name) + '</option>'; document.getElementById('mt1').innerHTML = o; document.getElementById('mt2').innerHTML = o; }
 
-    function updateStatsSelect() {
-      var s = document.getElementById('stats-match'), o = '<option value="">Матч...</option>';
+    function uss() {
+      var s = document.getElementById('sm'), o = '<option value="">Выберите матч...</option>';
       for (var i = DB.matches.length-1; i >= 0; i--) o += '<option value="' + i + '">' + esc(DB.matches[i].t1) + ' vs ' + esc(DB.matches[i].t2) + '</option>';
       s.innerHTML = o;
-      s.onchange = function() { buildStatsForm(parseInt(this.value)); };
+      s.onchange = function() { bsf(parseInt(this.value)); };
     }
 
-    function buildStatsForm(mi) {
-      if (isNaN(mi)) { document.getElementById('stats-form').innerHTML = ''; return; }
+    function bsf(mi) {
+      if (isNaN(mi)) { document.getElementById('sf').innerHTML = ''; return; }
       var m = DB.matches[mi]; if (!m.stats) m.stats = [];
-      var h = '<h4>' + esc(m.t1) + ' vs ' + esc(m.t2) + '</h4>';
-      if (m.stats.length) { for (var i = 0; i < m.stats.length; i++) h += '<div style="font-size:11px;color:#aaa;">' + esc(m.stats[i].p) + ': K' + m.stats[i].k + ' D' + m.stats[i].d + ' A' + (m.stats[i].a||0) + '</div>'; }
-      h += '<select id="sp"><option value="">Игрок...</option>';
-      var t1 = findTeam(m.t1), t2 = findTeam(m.t2);
+      var h = '<div style="margin-top:8px;font-size:11px;color:var(--text3);">' + esc(m.t1) + ' vs ' + esc(m.t2) + '</div>';
+      if (m.stats.length) { h += '<div style="font-size:10px;color:var(--text3);margin:4px 0;">Текущая статистика:</div>'; for (var i = 0; i < m.stats.length; i++) h += '<div style="font-size:10px;color:#aaa;">' + esc(m.stats[i].p) + ': K' + m.stats[i].k + ' D' + m.stats[i].d + ' A' + (m.stats[i].a||0) + '</div>'; }
+      h += '<select id="sp" style="margin-top:5px;"><option value="">Выберите игрока...</option>';
+      var t1 = ft(m.t1), t2 = ft(m.t2);
       if (t1&&t1.players) for (var j=0;j<t1.players.length;j++) h += '<option>' + esc(t1.players[j].nick) + '</option>';
       if (t2&&t2.players) for (var k=0;k<t2.players.length;k++) h += '<option>' + esc(t2.players[k].nick) + '</option>';
-      h += '</select><div class="row-inputs"><input id="sk" type="number" placeholder="K" value="0"><input id="sd" type="number" placeholder="D" value="0"><input id="sa" type="number" placeholder="A" value="0"></div>';
-      h += '<button class="green" onclick="ss(' + mi + ')">Сохранить</button>';
-      document.getElementById('stats-form').innerHTML = h;
+      h += '</select><div class="row"><input id="sk" type="number" placeholder="K" value="0"><input id="sd" type="number" placeholder="D" value="0"><input id="sa" type="number" placeholder="A" value="0"></div>';
+      h += '<button class="btn btn-green btn-sm" onclick="ss(' + mi + ')">Сохранить статистику</button>';
+      document.getElementById('sf').innerHTML = h;
     }
 
     function ss(mi) {
       var p = document.getElementById('sp').value, k = parseInt(document.getElementById('sk').value)||0, d = parseInt(document.getElementById('sd').value)||0, a = parseInt(document.getElementById('sa').value)||0;
       if (!p) return;
       if (!DB.matches[mi].stats) DB.matches[mi].stats = [];
-      for (var i = 0; i < DB.matches[mi].stats.length; i++) { if (DB.matches[mi].stats[i].p === p) { DB.matches[mi].stats[i] = {p:p,k:k,d:d,a:a}; save(); buildStatsForm(mi); buildMatches(); return; } }
-      DB.matches[mi].stats.push({p:p,k:k,d:d,a:a}); save(); buildStatsForm(mi); buildMatches();
+      for (var i = 0; i < DB.matches[mi].stats.length; i++) { if (DB.matches[mi].stats[i].p === p) { DB.matches[mi].stats[i] = {p:p,k:k,d:d,a:a}; save(); bsf(mi); matches(); return; } }
+      DB.matches[mi].stats.push({p:p,k:k,d:d,a:a}); save(); bsf(mi); matches();
     }
 
     function addTeam() {
-      var n = document.getElementById('add-name').value.trim(); if (!n) return;
-      DB.teams.push({name:n,region:document.getElementById('add-region').value.trim()||'EU',points:parseInt(document.getElementById('add-points').value)||500,logo:'',players:[]});
-      document.getElementById('add-name').value = ''; save(); ra();
+      var n = document.getElementById('an').value.trim(); if (!n) return;
+      DB.teams.push({name:n,region:document.getElementById('ar').value.trim()||'EU',points:parseInt(document.getElementById('ap').value)||500,logo:'',players:[]});
+      document.getElementById('an').value = ''; save(); ra();
     }
 
     function addMatch() {
-      DB.matches.push({t1:document.getElementById('m-t1').value,t2:document.getElementById('m-t2').value,score:document.getElementById('m-score').value.trim()||'0:0',event:document.getElementById('m-event').value.trim()||'Турнир',date:new Date().toLocaleDateString('ru-RU'),stats:[]});
-      save(); buildMatches(); updateStatsSelect();
-    }
-
-    function addGroup() {
-      var c = document.getElementById('groups-container'), n = c.querySelectorAll('.group-box').length, l = 'ABCDEFGH';
-      var d = document.createElement('div'); d.className = 'group-box';
-      d.innerHTML = '<b>Группа ' + (l[n]||'?') + '</b><input class="g-team" placeholder="Команда 1"><input class="g-team" placeholder="Команда 2"><input class="g-team" placeholder="Команда 3"><input class="g-team" placeholder="Команда 4">';
-      c.appendChild(d);
+      DB.matches.push({t1:document.getElementById('mt1').value,t2:document.getElementById('mt2').value,score:document.getElementById('ms').value.trim()||'0:0',event:document.getElementById('me').value.trim()||'Турнир',date:new Date().toLocaleDateString('ru-RU'),stats:[]});
+      document.getElementById('ms').value = ''; document.getElementById('me').value = ''; save(); matches(); uss();
     }
 
     function addTournament() {
-      var n = document.getElementById('t-name').value.trim(); if (!n) return;
-      var tp = document.getElementById('t-type').value, t = {name:n,type:tp,groups:[],bracket:[]};
-      
-      if (tp === 'groups') {
-        var gs = document.querySelectorAll('#groups-container .group-box');
-        for (var i = 0; i < gs.length; i++) {
-          var ins = gs[i].querySelectorAll('.g-team'), tms = [];
-          for (var j = 0; j < ins.length; j++) if (ins[j].value.trim()) tms.push({name:ins[j].value.trim(),p:0,w:0,pts:0});
-          if (tms.length) t.groups.push({teams:tms});
-        }
-      }
-      
-      var ps = document.querySelectorAll('#playoff-teams .p-team'), pteams = [];
+      var n = document.getElementById('tn').value.trim(); if (!n) return;
+      var ps = document.querySelectorAll('#pt .po'), pteams = [];
       for (var k = 0; k < ps.length; k++) if (ps[k].value.trim()) pteams.push(ps[k].value.trim());
-      
+      var t = { name:n, type:'playoff', bracket:[] };
       if (pteams.length >= 2) {
         var r1 = []; for (var x = 0; x < pteams.length; x += 2) if (pteams[x] && pteams[x+1]) r1.push({t1:pteams[x],t2:pteams[x+1],s:'',w:0});
-        var r2 = []; for (var y = 0; y < r1.length/2; y++) r2.push({t1:'',t2:'',s:'',w:0});
+        var r2 = []; for (var y = 0; y < Math.ceil(r1.length/2); y++) r2.push({t1:'',t2:'',s:'',w:0});
         var r3 = [{t1:'',t2:'',s:'',w:0}];
-        t.bracket = [r1,r2,r3];
+        t.bracket = r1.length > 2 ? [r1, r2, r3] : r1.length > 1 ? [r1, r3] : [r3];
       }
-      
-      DB.tournaments.push(t);
-      document.getElementById('t-name').value = ''; save(); buildTournaments();
+      DB.tournaments.push(t); document.getElementById('tn').value = '';
+      var inputs = document.querySelectorAll('#pt .po'); for (var z = 0; z < inputs.length; z++) inputs[z].value = '';
+      save(); tournaments();
     }
 
-    document.getElementById('t-type').addEventListener('change', function() {
-      document.getElementById('t-groups').style.display = this.value === 'groups' ? 'block' : 'none';
-    });
+    function showAdminPage() { buildAT(); buildAR(); us(); uss(); }
 
     async function init() {
-      if (localStorage.getItem('mltv_a') === '1') isAdmin = true;
-      await load(); buildRating(); buildMatches(); buildTournaments();
+      if (localStorage.getItem('mltv_ad_v3') === '1') admin = true;
+      await load();
+      rating(); matches(); tournaments();
     }
     init();
   </script>
