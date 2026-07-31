@@ -2,341 +2,166 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MLTV - CS2</title>
   <style>
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{background:#0b0b10;color:#e0e0e0;font-family:Arial,sans-serif;font-size:13px;padding-bottom:50px}
-    .topbar{background:#0a0a12;border-bottom:2px solid #fca311;padding:10px 15px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100}
-    .logo{font-size:24px;font-weight:900;color:#fff;cursor:pointer}
-    .logo span{color:#fca311}
-    button{background:#fca311;color:#000;border:none;padding:8px 14px;border-radius:4px;font-weight:700;font-size:11px;cursor:pointer;margin:2px}
-    button.red{background:#c62828;color:#fff}
-    button.green{background:#2e7d32;color:#fff}
-    button.sm{padding:4px 8px;font-size:9px}
-    .nav{display:flex;background:#12121a;border-bottom:1px solid #222;overflow-x:auto}
-    .nav button{flex:1;background:none;color:#999;border-radius:0;padding:12px;font-size:10px;text-transform:uppercase;border-bottom:2px solid transparent}
-    .nav button.active{color:#fff;border-bottom-color:#fca311}
-    .page{display:none;padding:12px}
-    .page.show{display:block}
-    .card{background:#12121c;border-radius:6px;border:1px solid #222;margin-bottom:6px;overflow:hidden}
-    .team-row{display:flex;align-items:center;gap:8px;padding:8px 12px;cursor:pointer;border-bottom:1px solid #1a1a2a}
-    .team-row:last-child{border-bottom:none}
-    .rank{width:28px;font-weight:700;color:#888;font-size:12px}
-    .team-row:nth-child(1) .rank{color:#ffd700}.team-row:nth-child(2) .rank{color:#c0c0c0}.team-row:nth-child(3) .rank{color:#cd7f32}
-    .tlogo{width:28px;height:28px;border-radius:4px;background:#1a1a2a;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:10px;overflow:hidden;flex-shrink:0}
-    .tlogo img{width:100%;height:100%;object-fit:cover}
-    .tname{font-weight:600;flex:1}
-    .tpoints{font-weight:700;color:#fca311}
-    .match-card{padding:8px 12px;cursor:pointer}
-    .match-header{font-size:9px;color:#888;margin-bottom:4px;display:flex;justify-content:space-between}
-    .match-header span:first-child{color:#fca311;font-weight:600}
-    .match-body{display:flex;align-items:center;gap:8px}
-    .match-team{flex:1;display:flex;align-items:center;gap:6px;font-weight:600;font-size:12px}
-    .match-team.r{justify-content:flex-end;text-align:right}
-    .match-score{font-size:16px;font-weight:700;background:#1a1a2a;padding:3px 8px;border-radius:4px}
-    .login-box{max-width:320px;margin:30px auto;background:#12121c;padding:20px;border-radius:6px;border:1px solid #222;text-align:center}
-    .login-box input{width:100%;padding:10px;margin:6px 0;background:#0a0a12;border:1px solid #333;border-radius:4px;color:#fff;text-align:center}
-    .admin-box{background:#12121c;border:1px solid #222;border-radius:6px;padding:10px;margin-bottom:8px}
-    .admin-box h4{color:#fca311;font-size:10px;text-transform:uppercase;margin-bottom:6px}
-    input,select{width:100%;padding:7px;margin:2px 0;background:#0a0a12;border:1px solid #333;border-radius:4px;color:#fff;font-size:11px}
-    .row{display:flex;gap:4px}.row>*{flex:1}
-    .back{color:#fca311;cursor:pointer;font-size:12px;display:inline-block;margin-bottom:8px}
-    .stats-table{width:100%;border-collapse:collapse;font-size:10px;margin:5px 0}
-    .stats-table th{background:#1a1a2a;padding:4px;color:#fca311}
-    .stats-table td{padding:4px;text-align:center;border-bottom:1px solid #1a1a2a}
-    .bracket-r{background:#12121c;border:1px solid #222;border-radius:4px;padding:8px;margin-bottom:5px}
-    .bracket-r h4{color:#fca311;font-size:11px;margin-bottom:4px}
-    .bracket-m{display:flex;align-items:center;gap:6px;padding:4px 0;font-size:11px}
-    .bracket-t{flex:1;font-weight:600}.bracket-s{color:#fca311;font-weight:700}.win{color:#4caf50}
-    .pavatar{width:32px;height:32px;border-radius:50%;background:#1a1a2a;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;overflow:hidden;flex-shrink:0}
-    .pavatar img{width:100%;height:100%;object-fit:cover}
-    .transfer-item{padding:5px 10px;border-bottom:1px solid #1a1a2a;font-size:10px}
-    .badge{padding:1px 5px;border-radius:3px;font-size:8px;font-weight:600}
-    .badge-in{background:rgba(76,175,80,0.2);color:#4caf50}
-    .badge-out{background:rgba(244,67,54,0.2);color:#f44336}
-    .empty{text-align:center;padding:25px;color:#666}
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0b0b10; color: #e0e0e0; font-family: Arial; font-size: 13px; padding-bottom: 40px; }
+    .header { background: #0a0a12; border-bottom: 2px solid #fca311; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+    .logo { font-size: 22px; font-weight: 900; color: #fff; cursor: pointer; } .logo span { color: #fca311; }
+    .btn { background: #fca311; color: #000; border: none; padding: 8px 14px; border-radius: 4px; font-weight: 700; font-size: 11px; cursor: pointer; }
+    .btn-red { background: #c62828; color: #fff; }
+    .btn-green { background: #2e7d32; color: #fff; }
+    .btn-sm { padding: 4px 8px; font-size: 9px; }
+    .nav { display: flex; background: #12121a; border-bottom: 1px solid #222; }
+    .nav button { flex: 1; background: none; border: none; color: #888; padding: 12px 8px; font-size: 10px; font-weight: 600; text-transform: uppercase; cursor: pointer; border-bottom: 2px solid transparent; }
+    .nav button.active { color: #fff; border-bottom-color: #fca311; }
+    .page { display: none; padding: 10px; }
+    .page.show { display: block; }
+    .card { background: #12121c; border: 1px solid #1a1a2a; border-radius: 5px; margin-bottom: 5px; }
+    .trow { display: flex; align-items: center; gap: 8px; padding: 8px 10px; cursor: pointer; border-bottom: 1px solid #1a1a2a; }
+    .trow:last-child { border-bottom: none; }
+    .rank { width: 26px; font-weight: 700; color: #888; }
+    .tlogo { width: 28px; height: 28px; border-radius: 4px; background: #1a1a2a; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10px; overflow: hidden; flex-shrink: 0; }
+    .tlogo img { width: 100%; height: 100%; object-fit: cover; }
+    .tname { flex: 1; font-weight: 600; }
+    .tpts { font-weight: 700; color: #fca311; }
+    .match-box { padding: 8px 10px; cursor: pointer; }
+    .match-top { font-size: 9px; color: #888; margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .match-mid { display: flex; align-items: center; gap: 8px; }
+    .mteam { flex: 1; display: flex; align-items: center; gap: 6px; font-weight: 600; }
+    .mteam.r { justify-content: flex-end; }
+    .mscore { font-size: 16px; font-weight: 700; background: #1a1a2a; padding: 2px 8px; border-radius: 3px; }
+    .login { max-width: 300px; margin: 30px auto; background: #12121c; padding: 20px; border: 1px solid #1a1a2a; border-radius: 5px; text-align: center; }
+    .login input { width: 100%; padding: 10px; margin: 5px 0; background: #0a0a12; border: 1px solid #333; border-radius: 3px; color: #fff; text-align: center; }
+    .abox { background: #12121c; border: 1px solid #1a1a2a; border-radius: 5px; padding: 8px; margin-bottom: 5px; }
+    .abox h4 { color: #fca311; font-size: 10px; margin-bottom: 5px; }
+    input, select { width: 100%; padding: 6px; margin: 2px 0; background: #0a0a12; border: 1px solid #333; border-radius: 3px; color: #fff; font-size: 10px; }
+    .row { display: flex; gap: 4px; } .row>* { flex: 1; }
+    .back { color: #fca311; cursor: pointer; font-size: 11px; display: inline-block; margin-bottom: 6px; }
+    table { width: 100%; border-collapse: collapse; font-size: 10px; margin: 5px 0; }
+    table th { background: #1a1a2a; padding: 4px; color: #fca311; }
+    table td { padding: 4px; text-align: center; border-bottom: 1px solid #1a1a2a; }
+    .bracket { background: #12121c; border: 1px solid #1a1a2a; border-radius: 4px; padding: 6px; margin-bottom: 4px; }
+    .bracket h5 { color: #fca311; font-size: 10px; margin-bottom: 3px; }
+    .bm { display: flex; gap: 6px; padding: 3px 0; font-size: 10px; }
+    .bt { flex: 1; }
+    .bs { color: #fca311; font-weight: 700; }
+    .pav { width: 28px; height: 28px; border-radius: 50%; background: #1a1a2a; display: flex; align-items: center; justify-content: center; font-size: 10px; overflow: hidden; flex-shrink: 0; }
+    .pav img { width: 100%; height: 100%; object-fit: cover; }
+    .tr { padding: 5px 8px; border-bottom: 1px solid #1a1a2a; font-size: 10px; }
+    .badge { padding: 1px 4px; border-radius: 2px; font-size: 8px; }
+    .bg { background: #1a3a1a; color: #4caf50; }
+    .br { background: #3a1a1a; color: #f44336; }
+    .empty { text-align: center; padding: 20px; color: #666; }
   </style>
 </head>
 <body>
-
-  <input type="file" accept="image/*" id="fileInput" style="display:none">
-
-  <div class="topbar">
-    <div class="logo" onclick="go('rating')">M<span>LTV</span></div>
-    <button onclick="openAdmin()">АДМИН</button>
-  </div>
-
+  <input type="file" accept="image/*" id="f" style="display:none">
+  <div class="header"><div class="logo" onclick="go('rating')">M<span>LTV</span></div><button class="btn" onclick="openAdmin()">АДМИН</button></div>
   <div class="nav">
     <button class="active" data-p="rating">Рейтинг</button>
     <button data-p="matches">Матчи</button>
     <button data-p="tournaments">Турниры</button>
     <button data-p="stats">Статистика</button>
-    <button data-p="transfers">Трансферы</button>
   </div>
-
-  <div id="p-login" class="page"><div class="login-box"><h3 style="color:#fca311;margin-bottom:10px">Вход</h3><input type="password" id="pw" placeholder="Пароль"><button onclick="login()" style="width:100%">Войти</button><button onclick="go('rating')" style="width:100%;background:#333;color:#fff;margin-top:4px">Отмена</button></div></div>
-
-  <div id="p-rating" class="page show"><div id="rating-list"></div></div>
-  <div id="p-matches" class="page"><div id="matches-list"></div></div>
-  <div id="p-tournaments" class="page"><div id="tournaments-list"></div></div>
-  <div id="p-tournament" class="page"><span class="back" onclick="go('tournaments')">← К турнирам</span><div id="tournament-view"></div></div>
-  <div id="p-match" class="page"><span class="back" onclick="go('matches')">← К матчам</span><div id="match-view"></div></div>
-  <div id="p-stats" class="page"><div id="stats-list"></div></div>
-  <div id="p-transfers" class="page"><div id="transfers-list"></div></div>
-  <div id="p-team" class="page"><span class="back" onclick="go('rating')">← К рейтингу</span><div id="team-view"></div></div>
-  <div id="p-player" class="page"><span class="back" onclick="history.back()">← Назад</span><div id="player-view"></div></div>
-
+  <div id="p-login" class="page"><div class="login"><h3 style="color:#fca311">Вход</h3><input type="password" id="pw" placeholder="Пароль"><button class="btn" onclick="login()" style="width:100%">Войти</button></div></div>
+  <div id="p-rating" class="page show"><div id="rating"></div></div>
+  <div id="p-matches" class="page"><div id="matches"></div></div>
+  <div id="p-tournaments" class="page"><div id="tournaments"></div></div>
+  <div id="p-tournament" class="page"><span class="back" onclick="go('tournaments')">← Назад</span><div id="tview"></div></div>
+  <div id="p-match" class="page"><span class="back" onclick="go('matches')">← Назад</span><div id="mview"></div></div>
+  <div id="p-stats" class="page"><div id="stats"></div></div>
+  <div id="p-team" class="page"><span class="back" onclick="go('rating')">← Назад</span><div id="team"></div></div>
+  <div id="p-player" class="page"><span class="back" onclick="history.back()">← Назад</span><div id="player"></div></div>
   <div id="p-admin" class="page">
-    <div class="admin-box"><div style="display:flex;justify-content:space-between"><h4>Админ-панель</h4><button class="red sm" onclick="logout()">Выйти</button></div></div>
-    <div class="admin-box"><h4>Добавить команду</h4><div class="row"><input id="an" placeholder="Название"><input id="ar" placeholder="Регион" value="EU" style="max-width:50px"></div><input id="ap" type="number" placeholder="Очки" value="500"><button onclick="addTeam()" style="width:100%;margin-top:3px">Добавить</button></div>
-    <div class="admin-box"><h4>Команды (нажми на лого)</h4><div id="admin-teams"></div></div>
-    <div class="admin-box"><h4>Составы (нажми на аватар)</h4><div id="admin-rosters"></div></div>
-    <div class="admin-box"><h4>Добавить матч</h4><div class="row"><select id="mt1"></select><select id="mt2"></select></div><div class="row"><input id="ms" placeholder="Счёт"><input id="me" placeholder="Турнир"></div><button onclick="addMatch()" style="width:100%">Добавить матч</button></div>
-    <div class="admin-box"><h4>Статистика матча</h4><select id="sm"></select><div id="sf"></div></div>
-    <div class="admin-box"><h4>Добавить трансфер</h4><select id="tr-player"></select><div class="row"><select id="tr-from"></select><select id="tr-to"></select></div><input id="tr-date" type="date" value="2026-08-01"><button onclick="addTransfer()" style="width:100%">Добавить трансфер</button></div>
-    <div class="admin-box"><h4>Создать турнир</h4><input id="tn" placeholder="Название"><p style="font-size:9px;color:#888">8 команд:</p><div class="row"><input class="po" placeholder="1"><input class="po" placeholder="2"></div><div class="row"><input class="po" placeholder="3"><input class="po" placeholder="4"></div><div class="row"><input class="po" placeholder="5"><input class="po" placeholder="6"></div><div class="row"><input class="po" placeholder="7"><input class="po" placeholder="8"></div><button onclick="addTournament()" style="width:100%">Создать</button></div>
+    <div class="abox"><div style="display:flex;justify-content:space-between"><h4>Админ</h4><button class="btn-red btn-sm" onclick="logout()">Выйти</button></div></div>
+    <div class="abox"><h4>Команда</h4><div class="row"><input id="an" placeholder="Название"><input id="ar" placeholder="EU" value="EU" style="max-width:45px"></div><input id="ap" type="number" value="500"><button class="btn" onclick="addTeam()" style="width:100%">Добавить</button></div>
+    <div class="abox"><h4>Команды</h4><div id="ateams"></div></div>
+    <div class="abox"><h4>Составы</h4><div id="arosters"></div></div>
+    <div class="abox"><h4>Матч</h4><div class="row"><select id="mt1"></select><select id="mt2"></select></div><div class="row"><input id="ms" placeholder="Счёт"><input id="me" placeholder="Турнир"></div><button class="btn" onclick="addMatch()" style="width:100%">Добавить</button></div>
+    <div class="abox"><h4>Статистика</h4><select id="sm"></select><div id="sf"></div></div>
+    <div class="abox"><h4>Турнир</h4><input id="tn" placeholder="Название"><div class="row"><input class="po" placeholder="1"><input class="po" placeholder="2"></div><div class="row"><input class="po" placeholder="3"><input class="po" placeholder="4"></div><div class="row"><input class="po" placeholder="5"><input class="po" placeholder="6"></div><div class="row"><input class="po" placeholder="7"><input class="po" placeholder="8"></div><button class="btn" onclick="addTournament()" style="width:100%">Создать</button></div>
   </div>
-
   <script>
-    var PW='mltv2026';
-    var SU='https://thlsltelqegxzpoptldd.supabase.co';
-    var SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRobHNsdGVscWVneHpwb3B0bGRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MjExNDcsImV4cCI6MjEwMDk5NzE0N30.RXOkkQxZ8CWkmJZZRZvXi0J4IVyLwG5LCIpi3TXj8z0';
-
-    var DB={teams:[],matches:[],tournaments:[],transfers:[]};
-    var admin=false,upload=null,cur='rating';
-
-    function def(){
-      var t=["Falcons","Vitality","Spirit","FURIA","Natus Vincere","9z","BetBoom","Aurora","G2","MOUZ","Legacy","The MongolZ","FaZe","FUT","Astralis","B8","PARIVISION","paiN","GamerLegion","Liquid"];
-      var r=["EU","EU","EU","SA","EU","SA","EU","EU","EU","EU","NA","AS","EU","EU","EU","EU","EU","SA","EU","NA"];
-      var p=[1000,982,965,912,894,870,845,822,798,775,752,731,708,684,661,642,620,598,572,555];
-      DB.teams=[];for(var i=0;i<t.length;i++)DB.teams.push({name:t[i],region:r[i],points:p[i],logo:"",players:[]});
-      DB.matches=[];DB.tournaments=[];DB.transfers=[];
-    }
-
-    async function load(){
-      try{var r=await fetch(SU+'/rest/v1/data?id=eq.1',{headers:{'apikey':SK,'Authorization':'Bearer '+SK}});if(r.ok){var d=await r.json();if(d[0]&&d[0].content){var p=JSON.parse(d[0].content);if(p.teams&&p.teams.length>0){DB=p;if(!DB.transfers)DB.transfers=[];if(!DB.matches)DB.matches=[];if(!DB.tournaments)DB.tournaments=[];return}}}}
-      catch(e){}
-      var s=localStorage.getItem('mltv_final');if(s){try{var p=JSON.parse(s);if(p.teams&&p.teams.length>0){DB=p;if(!DB.transfers)DB.transfers=[];if(!DB.matches)DB.matches=[];if(!DB.tournaments)DB.tournaments=[];return}}catch(e){}}
-      def();save();
-    }
-
-    function save(){var j=JSON.stringify(DB);localStorage.setItem('mltv_final',j);if(admin)fetch(SU+'/rest/v1/data?id=eq.1',{method:'PATCH',headers:{'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({content:j})}).catch(function(){})}
-
-    setInterval(async function(){try{var r=await fetch(SU+'/rest/v1/data?id=eq.1',{headers:{'apikey':SK,'Authorization':'Bearer '+SK}});if(r.ok){var d=await r.json();if(d[0]&&d[0].content){var p=JSON.parse(d[0].content);if(JSON.stringify(p)!==JSON.stringify(DB)){DB=p;if(!DB.transfers)DB.transfers=[];if(!DB.matches)DB.matches=[];if(!DB.tournaments)DB.tournaments=[];renderCur()}}}}catch(e){}},10000);
-
-    function renderCur(){if(cur==='rating')rating();if(cur==='matches')matches();if(cur==='tournaments')tournaments();if(cur==='stats')stats();if(cur==='transfers')transfers()}
-
+    var PW='mltv2026',SU='https://thlsltelqegxzpoptldd.supabase.co',SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRobHNsdGVscWVneHpwb3B0bGRkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU0MjExNDcsImV4cCI6MjEwMDk5NzE0N30.RXOkkQxZ8CWkmJZZRZvXi0J4IVyLwG5LCIpi3TXj8z0';
+    var DB={teams:[],matches:[],tournaments:[]},admin=false,upload=null,cur='rating';
+    function def(){var t=["Falcons","Vitality","Spirit","FURIA","Natus Vincere","9z","BetBoom","Aurora","G2","MOUZ","Legacy","The MongolZ","FaZe","FUT","Astralis","B8","PARIVISION","paiN","GamerLegion","Liquid"];var r=["EU","EU","EU","SA","EU","SA","EU","EU","EU","EU","NA","AS","EU","EU","EU","EU","EU","SA","EU","NA"];var p=[1000,982,965,912,894,870,845,822,798,775,752,731,708,684,661,642,620,598,572,555];DB.teams=[];for(var i=0;i<t.length;i++)DB.teams.push({name:t[i],region:r[i],points:p[i],logo:"",players:[]});DB.matches=[];DB.tournaments=[]}
+    function save(){var j=JSON.stringify(DB);localStorage.setItem('mdb',j);if(admin)fetch(SU+'/rest/v1/data?id=eq.1',{method:'PATCH',headers:{'apikey':SK,'Authorization':'Bearer '+SK,'Content-Type':'application/json','Prefer':'return=minimal'},body:JSON.stringify({content:j})}).catch(function(){})}
+    async function load(){try{var r=await fetch(SU+'/rest/v1/data?id=eq.1',{headers:{'apikey':SK,'Authorization':'Bearer '+SK}});if(r.ok){var d=await r.json();if(d[0]&&d[0].content){var p=JSON.parse(d[0].content);if(p.teams){DB=p;return}}}}catch(e){}var s=localStorage.getItem('mdb');if(s){try{var p=JSON.parse(s);if(p.teams){DB=p;return}}catch(e){}}def();save()}
     function esc(s){return s?String(s).replace(/</g,'&lt;').replace(/>/g,'&gt;'):''}
     function ft(n){for(var i=0;i<DB.teams.length;i++)if(DB.teams[i].name===n)return DB.teams[i];return null}
-
-    function logo(t){if(t&&t.logo&&t.logo.length>100)return'<img src="'+t.logo+'" style="width:100%;height:100%;object-fit:cover">';return esc((t&&t.name)?t.name.substring(0,2).toUpperCase():'??')}
-    function ava(p,cl,ti,pi){var o=cl?' onclick="upPhoto('+ti+','+pi+')"':'';if(p&&p.photo&&p.photo.length>100)return'<div class="pavatar"'+o+'><img src="'+p.photo+'" style="width:100%;height:100%;object-fit:cover"></div>';return'<div class="pavatar"'+o+'>'+esc((p&&p.nick)?p.nick[0].toUpperCase():'?')+'</div>'}
-
-    function gs(n){
-      var s={m:0,k:0,d:0,a:0,kd:'0.00',r:'0.00'};
-      for(var i=0;i<DB.matches.length;i++){var m=DB.matches[i];if(m.stats)for(var j=0;j<m.stats.length;j++)if(m.stats[j].p===n){s.m++;s.k+=parseInt(m.stats[j].k)||0;s.d+=parseInt(m.stats[j].d)||0;s.a+=parseInt(m.stats[j].a)||0}}
-      if(s.m>0){s.kd=(s.k/Math.max(1,s.d)).toFixed(2);s.r=Math.max(0,((s.k+0.7*s.a-0.3*s.d)/s.m/2)).toFixed(2)}
-      return s;
-    }
-
-    function go(p){
-      cur=p;
-      document.querySelectorAll('.page').forEach(function(x){x.classList.remove('show')});
-      document.querySelectorAll('.nav button').forEach(function(x){x.classList.remove('active')});
-      var pg=document.getElementById('p-'+p);if(pg)pg.classList.add('show');
-      var btn=document.querySelector('[data-p="'+p+'"]');if(btn)btn.classList.add('active');
-      if(p==='rating')rating();if(p==='matches')matches();if(p==='tournaments')tournaments();
-      if(p==='stats')stats();if(p==='transfers')transfers();if(p==='admin')showAdmin();
-    }
-
+    function logo(t){if(t&&t.logo&&t.logo.length>100)return'<img src="'+t.logo+'" style="width:100%;height:100%;object-fit:cover">';return(t&&t.name)?t.name.substring(0,2).toUpperCase():'??'}
+    function ava(p,c,ti,pi){var o=c?' onclick="upP('+ti+','+pi+')"':'';if(p&&p.photo&&p.photo.length>100)return'<div class="pav"'+o+'><img src="'+p.photo+'" style="width:100%;height:100%;object-fit:cover"></div>';return'<div class="pav"'+o+'>'+((p&&p.nick)?p.nick[0].toUpperCase():'?')+'</div>'}
+    function gs(n){var s={m:0,k:0,d:0,a:0,kd:'0.00',r:'0.00'};for(var i=0;i<DB.matches.length;i++){var m=DB.matches[i];if(m.stats)for(var j=0;j<m.stats.length;j++)if(m.stats[j].p===n){s.m++;s.k+=parseInt(m.stats[j].k)||0;s.d+=parseInt(m.stats[j].d)||0;s.a+=parseInt(m.stats[j].a)||0}}if(s.m>0){s.kd=(s.k/Math.max(1,s.d)).toFixed(2);s.r=Math.max(0,((s.k+0.7*s.a-0.3*s.d)/s.m/2)).toFixed(2)}return s}
+    function go(p){cur=p;document.querySelectorAll('.page').forEach(function(x){x.classList.remove('show')});document.querySelectorAll('.nav button').forEach(function(x){x.classList.remove('active')});document.getElementById('p-'+p).classList.add('show');var b=document.querySelector('[data-p="'+p+'"]');if(b)b.classList.add('active');if(p==='rating')rating();if(p==='matches')matches();if(p==='tournaments')tournaments();if(p==='stats')stats();if(p==='admin')showAdmin()}
     function openAdmin(){if(admin){go('admin');return}go('login')}
-    function login(){if(document.getElementById('pw').value===PW){admin=true;localStorage.setItem('mltv_ad','1');save();go('admin')}else alert('Неверный пароль!')}
-    function logout(){admin=false;localStorage.removeItem('mltv_ad');go('rating')}
-
-    function rating(){
-      DB.teams.sort(function(a,b){return b.points-a.points});
-      var h='';
-      for(var i=0;i<DB.teams.length;i++){var t=DB.teams[i];h+='<div class="card"><div class="team-row" onclick="showTeam('+i+')"><div class="rank">#'+(i+1)+'</div><div class="tlogo">'+logo(t)+'</div><div class="tname">'+esc(t.name)+' <span style="font-size:9px;color:#888">'+esc(t.region)+'</span></div><div class="tpoints">'+t.points+'</div></div></div>'}
-      document.getElementById('rating-list').innerHTML=h;
-    }
-
-    function showTeam(i){
-      go('team');var t=DB.teams[i];if(!t)return;if(!t.players)t.players=[];
-      var h='<div style="text-align:center;padding:8px"><div class="tlogo" style="width:50px;height:50px;margin:0 auto;border:2px solid #fca311">'+logo(t)+'</div><h2 style="margin-top:5px">'+esc(t.name)+'</h2><p style="color:#888">'+esc(t.region)+' • '+t.points+' очков</p></div>';
-      var tt=DB.transfers.filter(function(tr){return tr.from===t.name||tr.to===t.name});
-      if(tt.length){h+='<h4 style="color:#fca311">Последние трансферы</h4>';for(var tr=Math.max(0,tt.length-3);tr<tt.length;tr++){var tf=tt[tr];h+='<div class="transfer-item"><span style="color:#888;font-size:9px">'+esc(tf.date)+'</span> <b>'+esc(tf.player)+'</b> <span class="badge '+(tf.from===t.name?'badge-out':'badge-in')+'">'+(tf.from===t.name?'ушёл':'пришёл')+'</span></div>'}}
-      h+='<h4 style="color:#fca311;margin-top:8px">Состав</h4>';
-      if(!t.players.length)h+='<div class="empty"><p>Состав не добавлен</p></div>';
-      else{for(var p=0;p<t.players.length;p++){var pl=t.players[p],s=gs(pl.nick);h+='<div class="card"><div class="team-row" onclick="showPlayer('+i+','+p+')">'+ava(pl,false,i,p)+'<div style="flex:1"><b>'+esc(pl.nick)+'</b><br><span style="font-size:9px;color:#888">'+esc(pl.role)+'</span></div><div style="text-align:right;font-size:10px;color:#fca311">'+s.r+' • '+s.m+' матчей</div></div></div>'}}
-      document.getElementById('team-view').innerHTML=h;
-    }
-
-    function showPlayer(ti,pi){
-      go('player');var t=DB.teams[ti],pl=t.players[pi];if(!pl)return;
-      var s=gs(pl.nick);
-      var h='<div style="text-align:center;padding:10px">'+ava(pl,false,ti,pi)+'<h2>'+esc(pl.nick)+'</h2><p style="color:#888">'+esc(pl.role)+' • '+esc(t.name)+'</p></div>';
-      h+='<h4 style="color:#fca311">Статистика</h4><table class="stats-table"><tr><th>Матчи</th><th>K/D</th><th>Рейтинг</th><th>Kills</th><th>Deaths</th></tr><tr><td>'+s.m+'</td><td style="color:#fca311">'+s.kd+'</td><td style="color:#fca311">'+s.r+'</td><td>'+s.k+'</td><td>'+s.d+'</td></tr></table>';
-      var pm=[];for(var i=0;i<DB.matches.length;i++){var m=DB.matches[i];if(m.stats)for(var j=0;j<m.stats.length;j++)if(m.stats[j].p===pl.nick)pm.push({m:m,s:m.stats[j]})}
-      if(pm.length){h+='<h4 style="color:#fca311;margin-top:8px">История матчей</h4>';for(var k=pm.length-1;k>=Math.max(0,pm.length-10);k--)h+='<div class="card" style="padding:6px 10px"><span style="color:#888;font-size:9px">'+esc(pm[k].m.date)+'</span> <b>'+esc(pm[k].m.t1)+' '+esc(pm[k].m.score)+' '+esc(pm[k].m.t2)+'</b> <span style="color:#fca311">K:'+pm[k].s.k+' D:'+pm[k].s.d+'</span></div>'}
-      var pt=DB.transfers.filter(function(tr){return tr.player===pl.nick});
-      if(pt.length){h+='<h4 style="color:#fca311;margin-top:8px">История переходов</h4>';for(var l=0;l<pt.length;l++)h+='<div class="transfer-item"><span style="color:#888;font-size:9px">'+esc(pt[l].date)+'</span> <span class="badge badge-out">'+esc(pt[l].from)+'</span> → <span class="badge badge-in">'+esc(pt[l].to)+'</span></div>'}
-      document.getElementById('player-view').innerHTML=h;
-    }
-
-    function matches(){
-      var h='';
-      if(!DB.matches.length)h='<div class="empty"><p>Матчей пока нет</p></div>';
-      else for(var i=DB.matches.length-1;i>=0;i--){var m=DB.matches[i],t1=ft(m.t1),t2=ft(m.t2);h+='<div class="card"><div class="match-card" onclick="showMatch('+i+')"><div class="match-header"><span>'+esc(m.event||'Турнир')+'</span><span>'+esc(m.date)+'</span></div><div class="match-body"><div class="match-team"><div class="tlogo">'+logo(t1)+'</div>'+esc(m.t1)+'</div><div class="match-score">'+esc(m.score)+'</div><div class="match-team r">'+esc(m.t2)+'<div class="tlogo">'+logo(t2)+'</div></div></div></div></div>'}
-      document.getElementById('matches-list').innerHTML=h;
-    }
-
-    function showMatch(i){
-      go('match');var m=DB.matches[i];if(!m)return;
-      var t1=ft(m.t1),t2=ft(m.t2);
-      var h='<h2 style="text-align:center">'+esc(m.t1)+' vs '+esc(m.t2)+'</h2><p style="text-align:center;color:#888">'+esc(m.event)+' • '+esc(m.date)+'</p><div style="text-align:center;font-size:28px;font-weight:700;margin:6px 0">'+esc(m.score)+'</div>';
-      if(admin)h+='<div style="text-align:center;margin:6px 0"><button class="red sm" onclick="deleteMatch('+i+')">🗑 Удалить матч</button></div>';
-      if(!m.stats||!m.stats.length){h+='<div class="empty"><p>Статистика не добавлена</p></div>'}
-      else{
-        var s1=[],s2=[];
-        for(var j=0;j<m.stats.length;j++){var st=m.stats[j],e={p:st.p,k:st.k||0,d:st.d||0,a:st.a||0,kd:(st.d>0?(st.k/st.d).toFixed(2):st.k.toFixed(2))};if(t1&&t1.players&&t1.players.find(function(x){return x.nick===st.p}))s1.push(e);else s2.push(e)}
-        h+='<div style="display:flex;gap:8px"><div style="flex:1"><h4 style="color:#fca311">'+esc(m.t1)+'</h4><table class="stats-table"><tr><th>Игрок</th><th>K</th><th>D</th><th>A</th><th>K/D</th></tr>';
-        for(var k=0;k<s1.length;k++)h+='<tr><td>'+esc(s1[k].p)+'</td><td>'+s1[k].k+'</td><td>'+s1[k].d+'</td><td>'+s1[k].a+'</td><td style="color:#fca311">'+s1[k].kd+'</td></tr>';
-        h+='</table></div><div style="flex:1"><h4 style="color:#fca311">'+esc(m.t2)+'</h4><table class="stats-table"><tr><th>Игрок</th><th>K</th><th>D</th><th>A</th><th>K/D</th></tr>';
-        for(var l=0;l<s2.length;l++)h+='<tr><td>'+esc(s2[l].p)+'</td><td>'+s2[l].k+'</td><td>'+s2[l].d+'</td><td>'+s2[l].a+'</td><td style="color:#fca311">'+s2[l].kd+'</td></tr>';
-        h+='</table></div></div>';
-      }
-      document.getElementById('match-view').innerHTML=h;
-    }
-
-    function deleteMatch(i){if(!admin)return;if(confirm('Удалить матч?')){DB.matches.splice(i,1);save();matches();go('matches')}}
-
-    function tournaments(){
-      var h='';
-      if(!DB.tournaments.length)h='<div class="empty"><p>Турниров пока нет</p></div>';
-      else for(var i=0;i<DB.tournaments.length;i++){var t=DB.tournaments[i];h+='<div class="card" onclick="showTournament('+i+')" style="padding:10px;cursor:pointer;border-left:3px solid #fca311"><b>'+esc(t.name)+'</b><br><span style="font-size:10px;color:#888">Плей-офф • '+(t.bracket?t.bracket[0].length*2:0)+' команд</span></div>'}
-      document.getElementById('tournaments-list').innerHTML=h;
-    }
-
-    function showTournament(i){
-      go('tournament');var t=DB.tournaments[i];if(!t)return;
-      var h='<h2>'+esc(t.name)+'</h2>';
-      if(t.bracket&&t.bracket.length){
-        var rn=['1/4 финала','Полуфинал','Финал'];
-        for(var r=0;r<t.bracket.length;r++){h+='<div class="bracket-r"><h4>'+rn[r]+'</h4>';for(var m=0;m<t.bracket[r].length;m++){var bm=t.bracket[r][m];h+='<div class="bracket-m"><span class="bracket-t'+(bm.w===1?' win':'')+'">'+esc(bm.t1||'TBD')+'</span><span class="bracket-s">'+esc(bm.s||'vs')+'</span><span class="bracket-t'+(bm.w===2?' win':'')+'">'+esc(bm.t2||'TBD')+'</span></div>'}h+='</div>'}
-      }
-      var tms=DB.matches.filter(function(m){return m.event===t.name});
-      if(tms.length){h+='<h4 style="color:#fca311;margin-top:8px">Матчи турнира</h4>';for(var mi=0;mi<tms.length;mi++){var tm=tms[mi];h+='<div class="card" onclick="showMatch('+DB.matches.indexOf(tm)+')" style="padding:8px;cursor:pointer"><div class="match-body"><div class="match-team">'+esc(tm.t1)+'</div><div class="match-score">'+esc(tm.score)+'</div><div class="match-team r">'+esc(tm.t2)+'</div></div></div>'}}
-      document.getElementById('tournament-view').innerHTML=h;
-    }
-
-    function stats(){
-      var all=[];
-      for(var i=0;i<DB.teams.length;i++)for(var j=0;j<DB.teams[i].players.length;j++){var s=gs(DB.teams[i].players[j].nick);if(s.m>0)all.push({n:DB.teams[i].players[j].nick,t:DB.teams[i].name,s:s})}
-      all.sort(function(a,b){return parseFloat(b.s.r)-parseFloat(a.s.r)});
-      var h='';
-      if(!all.length)h='<div class="empty"><p>Нет данных</p></div>';
-      else{h+='<table class="stats-table"><tr><th>#</th><th>Игрок</th><th>Команда</th><th>М</th><th>K/D</th><th>Рейтинг</th></tr>';for(var k=0;k<all.length;k++)h+='<tr><td>'+(k+1)+'</td><td>'+esc(all[k].n)+'</td><td>'+esc(all[k].t)+'</td><td>'+all[k].s.m+'</td><td>'+all[k].s.kd+'</td><td style="color:#fca311">'+all[k].s.r+'</td></tr>';h+='</table>'}
-      document.getElementById('stats-list').innerHTML=h;
-    }
-
-    function transfers(){
-      var h='';
-      if(!DB.transfers.length)h='<div class="empty"><p>Трансферов пока нет</p></div>';
-      else{for(var i=DB.transfers.length-1;i>=0;i--){var t=DB.transfers[i];h+='<div class="transfer-item"><span style="color:#888;font-size:9px">'+esc(t.date)+'</span> <b>'+esc(t.player)+'</b> <span class="badge badge-out">'+esc(t.from)+'</span> → <span class="badge badge-in">'+esc(t.to)+'</span></div>'}}
-      document.getElementById('transfers-list').innerHTML=h;
-    }
-
-    function upLogo(i){upload={t:'logo',i:i};document.getElementById('fileInput').click()}
-    function upPhoto(i,p){upload={t:'photo',i:i,p:p};document.getElementById('fileInput').click()}
-
-    document.getElementById('fileInput').addEventListener('change',function(e){
-      if(!upload||!admin)return;var f=e.target.files[0];if(!f)return;
-      var r=new FileReader();
-      r.onload=function(ev){if(upload.t==='logo')DB.teams[upload.i].logo=ev.target.result;else DB.teams[upload.i].players[upload.p].photo=ev.target.result;save();buildAT();buildAR();rating();upload=null};
-      r.readAsDataURL(f);e.target.value='';
-    });
-
-    function buildAT(){
-      if(!admin)return;var h='';
-      for(var i=0;i<DB.teams.length;i++){var t=DB.teams[i];h+='<div style="background:#0a0a12;padding:5px;border-radius:3px;margin-bottom:3px;display:flex;align-items:center;gap:4px"><div class="tlogo" onclick="upLogo('+i+')" style="cursor:pointer;width:22px;height:22px">'+logo(t)+'</div><input value="'+esc(t.name)+'" onchange="uf('+i+',\'name\',this.value)" style="flex:2;margin:0;padding:3px;font-size:10px"><input value="'+esc(t.region)+'" onchange="uf('+i+',\'region\',this.value)" style="width:38px;margin:0;padding:3px;font-size:10px"><input type="number" value="'+t.points+'" onchange="uf('+i+',\'points\',parseInt(this.value)||0)" style="width:48px;margin:0;padding:3px;font-size:10px"><button class="sm" onclick="mu('+i+')">▲</button><button class="sm" onclick="md('+i+')">▼</button><button class="red sm" onclick="rt('+i+')">✕</button></div>'}
-      document.getElementById('admin-teams').innerHTML=h;
-    }
-
+    function login(){if(document.getElementById('pw').value===PW){admin=true;localStorage.setItem('a','1');go('admin')}else alert('Неверно')}
+    function logout(){admin=false;localStorage.removeItem('a');go('rating')}
+    function rating(){DB.teams.sort(function(a,b){return b.points-a.points});var h='';for(var i=0;i<DB.teams.length;i++){var t=DB.teams[i];h+='<div class="card"><div class="trow" onclick="showTeam('+i+')"><div class="rank">#'+(i+1)+'</div><div class="tlogo">'+logo(t)+'</div><div class="tname">'+esc(t.name)+'</div><div class="tpts">'+t.points+'</div></div></div>'}document.getElementById('rating').innerHTML=h}
+    function showTeam(i){go('team');var t=DB.teams[i];if(!t)return;if(!t.players)t.players=[];var h='<div style="text-align:center;padding:8px"><div class="tlogo" style="width:48px;height:48px;margin:0 auto;border:2px solid #fca311">'+logo(t)+'</div><h2>'+esc(t.name)+'</h2><p style="color:#888">'+t.points+' очков</p></div><h4 style="color:#fca311">Состав</h4>';if(!t.players.length)h+='<p style="color:#666">Нет игроков</p>';else for(var p=0;p<t.players.length;p++){var pl=t.players[p],s=gs(pl.nick);h+='<div class="card"><div class="trow" onclick="showPlayer('+i+','+p+')">'+ava(pl,false,i,p)+'<div style="flex:1"><b>'+esc(pl.nick)+'</b><br><span style="font-size:9px;color:#888">'+esc(pl.role)+'</span></div><div style="font-size:10px;color:#fca311">'+s.r+'</div></div></div>'}document.getElementById('team').innerHTML=h}
+    function showPlayer(ti,pi){go('player');var t=DB.teams[ti],pl=t.players[pi];if(!pl)return;var s=gs(pl.nick);var h='<div style="text-align:center;padding:8px">'+ava(pl,false,ti,pi)+'<h2>'+esc(pl.nick)+'</h2><p style="color:#888">'+esc(pl.role)+' • '+esc(t.name)+'</p></div><h4 style="color:#fca311">Статистика</h4><table><tr><th>Матчи</th><th>K/D</th><th>Рейтинг</th><th>K</th><th>D</th></tr><tr><td>'+s.m+'</td><td>'+s.kd+'</td><td style="color:#fca311">'+s.r+'</td><td>'+s.k+'</td><td>'+s.d+'</td></tr></table>';document.getElementById('player').innerHTML=h}
+    function matches(){var h='';if(!DB.matches.length)h='<p style="color:#666;text-align:center;padding:15px">Матчей нет</p>';else for(var i=DB.matches.length-1;i>=0;i--){var m=DB.matches[i],t1=ft(m.t1),t2=ft(m.t2);h+='<div class="card"><div class="match-box" onclick="showMatch('+i+')"><div class="match-top"><span style="color:#fca311">'+esc(m.event||'Турнир')+'</span><span>'+esc(m.date)+'</span></div><div class="match-mid"><div class="mteam"><div class="tlogo">'+logo(t1)+'</div>'+esc(m.t1)+'</div><div class="mscore">'+esc(m.score)+'</div><div class="mteam r">'+esc(m.t2)+'<div class="tlogo">'+logo(t2)+'</div></div></div></div></div>'}document.getElementById('matches').innerHTML=h}
+    function showMatch(i){go('match');var m=DB.matches[i];if(!m)return;var h='<h2 style="text-align:center">'+esc(m.t1)+' vs '+esc(m.t2)+'</h2><p style="text-align:center;color:#888">'+esc(m.event)+'</p><div style="text-align:center;font-size:26px;font-weight:700;margin:6px 0">'+esc(m.score)+'</div>';if(admin)h+='<div style="text-align:center"><button class="btn-red btn-sm" onclick="delMatch('+i+')">Удалить матч</button></div>';if(!m.stats||!m.stats.length)h+='<p style="color:#666;text-align:center">Статистика не добавлена</p>';else{var s1=[],s2=[];for(var j=0;j<m.stats.length;j++){var st=m.stats[j],e={p:st.p,k:st.k||0,d:st.d||0,a:st.a||0};if(m.t1===m.t1)s1.push(e);else s2.push(e)}h+='<div style="display:flex;gap:6px"><div style="flex:1"><h4 style="color:#fca311">'+esc(m.t1)+'</h4><table><tr><th>Игрок</th><th>K</th><th>D</th></tr>';for(var k=0;k<m.stats.length;k++)h+='<tr><td>'+esc(m.stats[k].p)+'</td><td>'+m.stats[k].k+'</td><td>'+m.stats[k].d+'</td></tr>';h+='</table></div></div>'}document.getElementById('mview').innerHTML=h}
+    function delMatch(i){if(!admin)return;if(confirm('Удалить?')){DB.matches.splice(i,1);save();go('matches')}}
+    function tournaments(){var h='';if(!DB.tournaments.length)h='<p style="color:#666;text-align:center;padding:15px">Турниров нет</p>';else for(var i=0;i<DB.tournaments.length;i++){var t=DB.tournaments[i];h+='<div class="card" onclick="showTournament('+i+')" style="padding:10px;cursor:pointer;border-left:3px solid #fca311"><b>'+esc(t.name)+'</b></div>'}document.getElementById('tournaments').innerHTML=h}
+    function showTournament(i){go('tournament');var t=DB.tournaments[i];if(!t)return;var h='<h2>'+esc(t.name)+'</h2>';if(t.bracket){for(var r=0;r<t.bracket.length;r++){h+='<div class="bracket"><h5>Раунд '+(r+1)+'</h5>';for(var m=0;m<t.bracket[r].length;m++){var bm=t.bracket[r][m];h+='<div class="bm"><span class="bt">'+esc(bm.t1||'?')+'</span><span class="bs">'+esc(bm.s||'vs')+'</span><span class="bt">'+esc(bm.t2||'?')+'</span></div>'}h+='</div>'}}document.getElementById('tview').innerHTML=h}
+    function stats(){var all=[];for(var i=0;i<DB.teams.length;i++)for(var j=0;j<DB.teams[i].players.length;j++){var s=gs(DB.teams[i].players[j].nick);if(s.m>0)all.push({n:DB.teams[i].players[j].nick,t:DB.teams[i].name,s:s})}all.sort(function(a,b){return parseFloat(b.s.r)-parseFloat(a.s.r)});var h='';if(!all.length)h='<p style="color:#666;text-align:center;padding:15px">Нет данных</p>';else{h='<table><tr><th>#</th><th>Игрок</th><th>Команда</th><th>М</th><th>K/D</th><th>Рейтинг</th></tr>';for(var k=0;k<all.length;k++)h+='<tr><td>'+(k+1)+'</td><td>'+esc(all[k].n)+'</td><td>'+esc(all[k].t)+'</td><td>'+all[k].s.m+'</td><td>'+all[k].s.kd+'</td><td style="color:#fca311">'+all[k].s.r+'</td></tr>';h+='</table>'}document.getElementById('stats').innerHTML=h}
+    function upL(i){upload={t:'l',i:i};document.getElementById('f').click()}
+    function upP(i,p){upload={t:'p',i:i,p:p};document.getElementById('f').click()}
+    document.getElementById('f').addEventListener('change',function(e){if(!upload||!admin)return;var f=e.target.files[0];if(!f)return;var r=new FileReader();r.onload=function(ev){if(upload.t==='l')DB.teams[upload.i].logo=ev.target.result;else DB.teams[upload.i].players[upload.p].photo=ev.target.result;save();buildAT();buildAR();rating();upload=null};r.readAsDataURL(f);e.target.value=''})
+    function buildAT(){if(!admin)return;var h='';for(var i=0;i<DB.teams.length;i++){var t=DB.teams[i];h+='<div style="display:flex;align-items:center;gap:4px;margin-bottom:3px"><div class="tlogo" onclick="upL('+i+')" style="cursor:pointer;width:22px;height:22px">'+logo(t)+'</div><input value="'+esc(t.name)+'" onchange="uf('+i+',\'name\',this.value)" style="flex:2;padding:3px;font-size:10px"><input type="number" value="'+t.points+'" onchange="uf('+i+',\'points\',parseInt(this.value)||0)" style="width:50px;padding:3px;font-size:10px"><button class="btn-sm" onclick="mu('+i+')">▲</button><button class="btn-sm" onclick="md('+i+')">▼</button><button class="btn-red btn-sm" onclick="rt('+i+')">✕</button></div>'}document.getElementById('ateams').innerHTML=h}
     function uf(i,f,v){DB.teams[i][f]=(f==='points'?parseInt(v)||0:v);save();rating()}
     function mu(i){if(i<=0)return;var t=DB.teams[i];DB.teams[i]=DB.teams[i-1];DB.teams[i-1]=t;save();ra()}
     function md(i){if(i>=DB.teams.length-1)return;var t=DB.teams[i];DB.teams[i]=DB.teams[i+1];DB.teams[i+1]=t;save();ra()}
     function rt(i){if(DB.teams.length<=1)return;if(confirm('Удалить?')){DB.teams.splice(i,1);save();ra()}}
-    function ra(){rating();buildAT();buildAR();us();uss();ut()}
-
-    function buildAR(){
-      if(!admin)return;var h='';
-      for(var i=0;i<DB.teams.length;i++){var t=DB.teams[i];if(!t.players)t.players=[];h+='<div style="background:#0a0a12;padding:5px;border-radius:3px;margin-bottom:3px"><div style="display:flex;justify-content:space-between;margin-bottom:2px"><b style="font-size:10px">'+esc(t.name)+'</b><button class="green sm" onclick="ap('+i+')">+</button></div>';for(var p=0;p<t.players.length;p++){var pl=t.players[p];h+='<div style="display:flex;gap:3px;align-items:center;margin-top:2px">'+ava(pl,true,i,p)+'<input value="'+esc(pl.nick)+'" onchange="up('+i+','+p+',\'nick\',this.value)" style="flex:2;margin:0;padding:3px;font-size:10px"><input value="'+esc(pl.role)+'" onchange="up('+i+','+p+',\'role\',this.value)" style="flex:1;margin:0;padding:3px;font-size:10px"><button class="red sm" onclick="dp('+i+','+p+')">✕</button></div>'}h+='</div>'}
-      document.getElementById('admin-rosters').innerHTML=h;
-    }
-
-    function ap(i){if(!admin)return;DB.teams[i].players.push({nick:'Игрок',role:'Роль',photo:''});save();buildAR();ut()}
-    function up(i,p,f,v){if(!admin)return;DB.teams[i].players[p][f]=v;save()}
-    function dp(i,p){if(!admin)return;DB.teams[i].players.splice(p,1);save();buildAR();ut()}
-
+    function ra(){rating();buildAT();buildAR();us();uss()}
+    function buildAR(){if(!admin)return;var h='';for(var i=0;i<DB.teams.length;i++){var t=DB.teams[i];if(!t.players)t.players=[];h+='<div style="margin-bottom:4px"><b style="font-size:10px">'+esc(t.name)+'</b> <button class="btn-green btn-sm" onclick="ap('+i+')">+</button>';for(var p=0;p<t.players.length;p++){var pl=t.players[p];h+='<div style="display:flex;gap:3px;align-items:center;margin-top:2px">'+ava(pl,true,i,p)+'<input value="'+esc(pl.nick)+'" onchange="upp('+i+','+p+',\'nick\',this.value)" style="flex:2;padding:2px;font-size:10px"><input value="'+esc(pl.role)+'" onchange="upp('+i+','+p+',\'role\',this.value)" style="flex:1;padding:2px;font-size:10px"><button class="btn-red btn-sm" onclick="dp('+i+','+p+')">✕</button></div>'}h+='</div>'}document.getElementById('arosters').innerHTML=h}
+    function ap(i){DB.teams[i].players.push({nick:'Игрок',role:'Роль',photo:''});save();buildAR()}
+    function upp(i,p,f,v){DB.teams[i].players[p][f]=v;save()}
+    function dp(i,p){DB.teams[i].players.splice(p,1);save();buildAR()}
     function us(){var o='';for(var i=0;i<DB.teams.length;i++)o+='<option>'+esc(DB.teams[i].name)+'</option>';document.getElementById('mt1').innerHTML=o;document.getElementById('mt2').innerHTML=o}
-
-    function uss(){
-      var s=document.getElementById('sm'),o='<option value="">Матч...</option>';
-      for(var i=DB.matches.length-1;i>=0;i--)o+='<option value="'+i+'">'+esc(DB.matches[i].t1)+' vs '+esc(DB.matches[i].t2)+'</option>';
-      s.innerHTML=o;s.onchange=function(){bsf(parseInt(this.value))};
-    }
-
-    function bsf(mi){
-      if(isNaN(mi)){document.getElementById('sf').innerHTML='';return}
-      var m=DB.matches[mi];if(!m.stats)m.stats=[];
-      var h='<p style="font-size:10px;color:#888">'+esc(m.t1)+' vs '+esc(m.t2)+'</p>';
-      if(m.stats.length){for(var i=0;i<m.stats.length;i++)h+='<div style="font-size:9px;color:#aaa">'+esc(m.stats[i].p)+': K'+m.stats[i].k+' D'+m.stats[i].d+'</div>';h+='<button class="red sm" onclick="clearStats('+mi+')">Очистить</button>'}
-      h+='<select id="sp"><option value="">Игрок...</option>';
+    function uss(){var s=document.getElementById('sm'),o='<option value="">Матч...</option>';for(var i=DB.matches.length-1;i>=0;i--)o+='<option value="'+i+'">'+esc(DB.matches[i].t1)+' vs '+esc(DB.matches[i].t2)+'</option>';s.innerHTML=o;s.onchange=function(){bsf(parseInt(this.value))}}
+    function bsf(mi){if(isNaN(mi)){document.getElementById('sf').innerHTML='';return}var m=DB.matches[mi];if(!m.stats)m.stats=[];var h='<p style="font-size:10px;color:#888">'+esc(m.t1)+' vs '+esc(m.t2)+'</p>';if(m.stats.length)for(var i=0;i<m.stats.length;i++)h+='<div style="font-size:9px;color:#aaa">'+esc(m.stats[i].p)+': K'+m.stats[i].k+' D'+m.stats[i].d+'</div>';h+='<select id="sp"><option value="">Игрок...</option>';
       var t1=ft(m.t1),t2=ft(m.t2);
       if(t1&&t1.players)for(var j=0;j<t1.players.length;j++)h+='<option>'+esc(t1.players[j].nick)+'</option>';
       if(t2&&t2.players)for(var k=0;k<t2.players.length;k++)h+='<option>'+esc(t2.players[k].nick)+'</option>';
       h+='</select><div class="row"><input id="sk" type="number" placeholder="K" value="0"><input id="sd" type="number" placeholder="D" value="0"><input id="sa" type="number" placeholder="A" value="0"></div>';
-      h+='<button class="green sm" onclick="ss('+mi+')">Сохранить</button>';
+      h+='<button class="btn-green btn-sm" onclick="ss('+mi+')">Сохранить</button>';
       document.getElementById('sf').innerHTML=h;
     }
 
     function ss(mi){
-      if(!admin)return;
       var p=document.getElementById('sp').value,k=parseInt(document.getElementById('sk').value)||0,d=parseInt(document.getElementById('sd').value)||0,a=parseInt(document.getElementById('sa').value)||0;
       if(!p)return;
       if(!DB.matches[mi].stats)DB.matches[mi].stats=[];
-      for(var i=0;i<DB.matches[mi].stats.length;i++){if(DB.matches[mi].stats[i].p===p){DB.matches[mi].stats[i]={p:p,k:k,d:d,a:a};save();bsf(mi);return}}
       DB.matches[mi].stats.push({p:p,k:k,d:d,a:a});save();bsf(mi);
     }
 
-    function clearStats(mi){if(!admin)return;if(confirm('Очистить?')){DB.matches[mi].stats=[];save();bsf(mi)}}
-
-    function ut(){
-      if(!admin)return;
-      var ps=document.getElementById('tr-player'),o='<option value="">Игрок...</option>';
-      for(var i=0;i<DB.teams.length;i++)for(var j=0;j<DB.teams[i].players.length;j++)o+='<option value="'+esc(DB.teams[i].players[j].nick)+'|||'+i+'">'+esc(DB.teams[i].players[j].nick)+' ('+esc(DB.teams[i].name)+')</option>';
-      ps.innerHTML=o;
-      var to='<option value="">Команда...</option>';for(var t=0;t<DB.teams.length;t++)to+='<option>'+esc(DB.teams[t].name)+'</option>';
-      document.getElementById('tr-from').innerHTML=to;document.getElementById('tr-to').innerHTML=to;
+    function addTeam(){
+      var n=document.getElementById('an').value.trim();if(!n)return;
+      DB.teams.push({name:n,region:document.getElementById('ar').value.trim()||'EU',points:parseInt(document.getElementById('ap').value)||500,logo:'',players:[]});
+      document.getElementById('an').value='';save();ra();
     }
 
-    function addTransfer(){
-      if(!admin)return;
-      var p=document.getElementById('tr-player').value,from=document.getElementById('tr-from').value,to=document.getElementById('tr-to').value,date=document.getElementById('tr-date').value;
-      if(!p||!from||!to){alert('Заполните все поля!');return}
-      DB.transfers.push({player:p.split('|||')[0],from:from,to:to,date:date});
-      save();transfers();ut();alert('Трансфер добавлен!');
+    function addMatch(){
+      DB.matches.push({t1:document.getElementById('mt1').value,t2:document.getElementById('mt2').value,score:document.getElementById('ms').value||'0:0',event:document.getElementById('me').value||'Турнир',date:new Date().toLocaleDateString('ru-RU'),stats:[]});
+      save();go('matches');
     }
 
-    function addTeam(){if(!admin)return;var n=document.getElementById('an').value.trim();if(!n)return;DB.teams.push({name:n,region:document.getElementById('ar').value.trim()||'EU',points:parseInt(document.getElementById('ap').value)||500,logo:'',players:[]});document.getElementById('an').value='';save();ra()}
-    function addMatch(){if(!admin)return;DB.matches.push({t1:document.getElementById('mt1').value,t2:document.getElementById('mt2').value,score:document.getElementById('ms').value.trim()||'0:0',event:document.getElementById('me').value.trim()||'Турнир',date:new Date().toLocaleDateString('ru-RU'),stats:[]});document.getElementById('ms').value='';document.getElementById('me').value='';save();matches();uss()}
-    function addTournament(){if(!admin)return;var n=document.getElementById('tn').value.trim();if(!n)return;var ps=document.querySelectorAll('.po'),pteams=[];for(var k=0;k<ps.length;k++)if(ps[k].value.trim())pteams.push(ps[k].value.trim());var t={name:n,type:'playoff',bracket:[]};if(pteams.length>=2){var r1=[];for(var x=0;x<pteams.length;x+=2)if(pteams[x]&&pteams[x+1])r1.push({t1:pteams[x],t2:pteams[x+1],s:'',w:0});var r2=[];for(var y=0;y<Math.ceil(r1.length/2);y++)r2.push({t1:'',t2:'',s:'',w:0});var r3=[{t1:'',t2:'',s:'',w:0}];t.bracket=r1.length>2?[r1,r2,r3]:r1.length>1?[r1,r3]:[r3]}DB.tournaments.push(t);document.getElementById('tn').value='';var ins=document.querySelectorAll('.po');for(var z=0;z<ins.length;z++)ins[z].value='';save();tournaments()}
+    function addTournament(){
+      var n=document.getElementById('tn').value.trim();if(!n)return;
+      var ps=document.querySelectorAll('.po'),pteams=[];
+      for(var k=0;k<ps.length;k++)if(ps[k].value.trim())pteams.push(ps[k].value.trim());
+      var t={name:n,bracket:[]};
+      if(pteams.length>=2){var r1=[];for(var x=0;x<pteams.length;x+=2)if(pteams[x]&&pteams[x+1])r1.push({t1:pteams[x],t2:pteams[x+1],s:'',w:0});t.bracket=[r1]}
+      DB.tournaments.push(t);document.getElementById('tn').value='';save();go('tournaments');
+    }
 
-    function showAdmin(){buildAT();buildAR();us();uss();ut()}
+    function showAdmin(){buildAT();buildAR();us();uss();}
 
-    if(localStorage.getItem('mltv_ad')==='1')admin=true;
-    load();rating();matches();tournaments();transfers();
+    if(localStorage.getItem('a')==='1')admin=true;
+    load();rating();matches();tournaments();
   </script>
 </body>
 </html>
